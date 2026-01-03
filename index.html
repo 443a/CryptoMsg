@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ابزار امن رمزنگاری متن و پنهان‌نگاری (Web Crypto API)">
+    <meta name="description" content="ابزار فوق امن رمزنگاری متن و پنهان‌نگاری (Web Crypto API)">
     <meta name="author" content="443a">
     <meta name="theme-color" content="#0f172a">
     
-    <title>کریپتو مسنجر | CryptoMsg</title>
+    <title>کریپتو مسنجر | CryptoMsg Ultimate</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
@@ -21,15 +21,13 @@
     <button id="installBtn"><i class="fas fa-download"></i> نصب اپلیکیشن</button>
 
     <div class="header-bar">
-        <div class="app-title"><i class="fas fa-shield-halved"></i> CryptoMsg <small style="font-size:0.6em; opacity:0.7; margin-right:5px;">Pro</small></div>
+        <div class="app-title"><i class="fas fa-shield-halved"></i> CryptoMsg <small style="font-size:0.6em; opacity:0.7; margin-right:5px;">Ultimate</small></div>
         <div class="version-badge" onclick="updateApp()">
-            <i class="fas fa-sync-alt"></i> نسخه ۴.۴ (بروزرسانی)
+            <i class="fas fa-sync-alt"></i> نسخه 4.5 (Full)
         </div>
     </div>
 
     <div class="container">
-        <h2>پیام‌رسان سری</h2>
-
         <div class="tabs">
             <button id="tabEnc" class="tab-btn active enc" onclick="setMode('encrypt')">ارسال (رمزنگاری)</button>
             <button id="tabDec" class="tab-btn" onclick="setMode('decrypt')">دریافت (رمزگشایی)</button>
@@ -37,28 +35,36 @@
 
         <div id="encSettings">
             <div class="form-group">
-                <label><i class="fas fa-layer-group"></i> روش مخفی‌سازی:</label>
-                <select id="encodingMode" onchange="toggleCoverInput()">
-                    <option value="base64">استاندارد (Base64) - کپی راحت</option>
-                    <option value="farsiChars">حروف تصادفی فارسی (مناسب پیامک)</option>
-                    <option value="invisible">متن نامرئی / Steganography ✨</option>
-                    <option value="farsiWords">جملات واقعی فارسی (طبیعی)</option>
-                    <option value="russian">حروف روسی (ضد فیلتر)</option>
-                    <option value="emoji">ایموجی‌ها (😂😎🚀)</option>
+                <label><i class="fas fa-layer-group"></i> انتخاب روش مخفی‌سازی:</label>
+                <select id="encodingMode" onchange="updateMethodInfo()">
+                    <option value="base64">استاندارد (Base64)</option>
+                    <option value="farsiChars">حروف تصادفی فارسی</option>
+                    <option value="farsiWords">جملات واقعی فارسی</option>
+                    <option value="invisible">متن نامرئی (Steganography)</option>
+                    <option value="russian">حروف روسی (Cyrillic)</option>
+                    <option value="emoji">ایموجی (Emoji)</option>
                     <option value="chinese">کاراکترهای چینی</option>
                     <option value="englishFake">انگلیسی (Fake English)</option>
                 </select>
             </div>
 
-            <div id="coverTextInput" class="form-group">
-                <label><i class="fas fa-mask"></i> متن پوششی:</label>
+            <div id="methodInfoBox" class="method-info">
+                <i class="fas fa-info-circle"></i> <span id="methodDesc">توضیحات روش اینجا نمایش داده می‌شود.</span>
+            </div>
+            
+            <div id="securityWarning" class="warning-box" style="display:none;">
+                <i class="fas fa-exclamation-triangle"></i> <span id="warningText"></span>
+            </div>
+
+            <div id="coverTextInput" class="form-group" style="display:none;">
+                <label><i class="fas fa-mask"></i> متن پوششی (برای مخفی‌سازی):</label>
                 <input type="text" id="coverText" placeholder="مثلاً: سلام چطوری؟ خوبی؟">
                 <div class="hint-text">پیام اصلی شما لابلای این متن مخفی می‌شود.</div>
             </div>
 
             <label class="checkbox-wrapper" for="splitOutput">
                 <input type="checkbox" id="splitOutput" checked>
-                <span class="checkbox-label">تقسیم خودکار پیام‌های طولانی (پارت‌بندی)</span>
+                <span class="checkbox-label">تقسیم هوشمند پیام‌های طولانی (پارت‌بندی)</span>
             </label>
         </div>
 
@@ -67,15 +73,15 @@
             <textarea id="inputText" rows="3" placeholder="پیام محرمانه خود را بنویسید..." oninput="analyzeInput()"></textarea>
         </div>
 
-        <div id="smartSuggestion" class="smart-suggestion">
-            <i class="fas fa-lightbulb"></i> <span id="suggestionText"></span>
+        <div id="smartSuggestion" class="smart-suggestion" style="display:none;">
+            <i class="fas fa-robot"></i> <span id="suggestionText"></span>
         </div>
 
         <div class="form-group">
             <div class="pass-header">
-                <label><i class="fas fa-key"></i> رمز عبور:</label>
+                <label><i class="fas fa-key"></i> رمز عبور (حیاتی):</label>
                 <span class="gen-pass-btn" onclick="generatePassword()">
-                    <i class="fas fa-magic"></i> ساخت رمز قوی
+                    <i class="fas fa-magic"></i> ساخت رمز جادویی
                 </span>
             </div>
             
@@ -92,13 +98,13 @@
         </div>
 
         <button id="actionBtn" class="btn-main btn-enc" onclick="process()">
-            <i class="fas fa-lock"></i> تولید پیام امن
+            <i class="fas fa-lock"></i> اجرای عملیات امنیتی
         </button>
 
         <div id="resultArea" class="result-container">
             <div class="stats-box">
-                <span id="charCount"></span>
-                <span id="smsCount"></span>
+                <div><i class="fas fa-text-width"></i> <span id="charCount">0</span> کاراکتر</div>
+                <div><i class="fas fa-envelope"></i> <span id="smsCount">0</span> پیامک (تقریبی)</div>
             </div>
             <div id="outputParts"></div>
         </div>
@@ -107,89 +113,33 @@
     <div class="info-container">
         
         <details>
-            <summary><i class="fas fa-book-open" style="color: var(--primary);"></i> راهنمای ساده (چطور کار کنم؟)</summary>
+            <summary><i class="fas fa-book-open" style="color: var(--primary);"></i> راهنمای انتخاب روش‌ها</summary>
             <div class="info-content">
-                <h4 style="margin-top:0; color:var(--text);">📤 برای ارسال پیام:</h4>
-                <ol style="padding-right: 20px; margin-bottom: 15px;">
-                    <li><strong>نوشتن:</strong> پیام محرمانه خود را در کادر بنویسید.</li>
-                    <li><strong>رمزگذاری:</strong> یک رمز عبور قوی انتخاب کنید (این رمز را باید به گیرنده هم بگویید).</li>
-                    <li><strong>انتخاب ظاهر:</strong>
-                        <ul>
-                            <li><small>🔹 <strong>استاندارد:</strong> برای کپی راحت در تلگرام/واتساپ.</small></li>
-                            <li><small>🔹 <strong>متن نامرئی:</strong> اگر می‌خواهید پیام در توییتر/اینستاگرام دیده نشود.</small></li>
-                        </ul>
-                    </li>
-                    <li><strong>ارسال:</strong> دکمه "تولید پیام" را بزنید، متن عجیب تولید شده را کپی کنید و بفرستید.</li>
-                </ol>
-
-                <h4 style="color:var(--text);">📥 برای خواندن پیام:</h4>
-                <ol style="padding-right: 20px;">
-                    <li>روی دکمه <strong>"دریافت (رمزگشایی)"</strong> در بالای صفحه کلیک کنید.</li>
-                    <li>متن رمز شده‌ای که دریافت کرده‌اید را در کادر وارد کنید.</li>
-                    <li>همان رمز عبوری که فرستنده گذاشته بود را بزنید تا پیام باز شود.</li>
-                </ol>
-            </div>
-        </details>
-
-        <details>
-            <summary><i class="fas fa-shield-alt" style="color: var(--warning);"></i> نکات مهم امنیتی (حتما بخوانید)</summary>
-            <div class="info-content">
-                <ul style="list-style-type: none; padding: 0;">
-                    <li style="margin-bottom: 10px;">
-                        🚫 <strong>رمز را جداگانه بفرستید:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">هرگز رمز عبور را در همان پیامی که متن رمز شده را می‌فرستید، قرار ندهید. (مثلاً متن را در واتساپ بفرستید و رمز را تلفنی بگویید).</span>
-                    </li>
-                    <li style="margin-bottom: 10px;">
-                        ⌨️ <strong>مراقب کیبوردها باشید:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">کیبوردهای گوشی کلمات شما را یاد می‌گیرند. برای امنیت ۱۰۰٪، از کیبوردهای امن یا حالت Incognito مرورگر استفاده کنید.</span>
-                    </li>
-                    <li style="margin-bottom: 10px;">
-                        📋 <strong>حافظه کپی را پاک کنید:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">بعد از اینکه پیام را کپی و ارسال کردید، یک متن الکی دیگر کپی کنید تا پیام اصلی از حافظه گوشی (Clipboard) پاک شود.</span>
-                    </li>
-                    <li style="margin-bottom: 10px;">
-                        ⚠️ <strong>فراموشی رمز = نابودی پیام:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">چون ما هیچ سروری نداریم، اگر رمز عبور را فراموش کنید، هیچ راهی برای بازگرداندن پیام وجود ندارد.</span>
-                    </li>
+                <ul>
+                    <li><strong>حروف تصادفی فارسی:</strong> بهترین گزینه برای <span style="color:var(--success)">SMS</span> (چون اپراتورها حساس نیستند).</li>
+                    <li><strong>متن نامرئی:</strong> مخصوص <span style="color:var(--secondary)">اینستاگرام و توییتر</span>. پیام کاملاً ناپدید می‌شود (داخل یک متن عادی).</li>
+                    <li><strong>جملات فارسی:</strong> تبدیل به کلمات معنی‌دار (مثل "سیب درخت آسمان"). بسیار طبیعی برای ربات‌های فیلترینگ.</li>
+                    <li><strong>حروف روسی/چینی:</strong> برای گیج کردن الگوریتم‌های هوش مصنوعی که دنبال کلمات فارسی یا انگلیسی می‌گردند.</li>
+                    <li><strong>استاندارد (Base64):</strong> فقط برای کپی در فایل متنی یا جایی که ظاهر مهم نیست.</li>
                 </ul>
             </div>
         </details>
 
         <details>
-            <summary><i class="fas fa-code" style="color: var(--success);"></i> مشخصات فنی (نسخه ۴.۴)</summary>
+            <summary><i class="fas fa-shield-alt" style="color: var(--danger);"></i> هشدارهای امنیتی (مهم)</summary>
             <div class="info-content">
-                <p><strong>امنیت هسته جدید (Web Crypto API):</strong></p>
-                <p style="text-align: justify; font-size: 0.85rem;">
-                    در این نسخه، ما از موتور رمزنگاری داخلی مرورگر استفاده می‌کنیم که سریع‌تر و امن‌تر است.
-                    <br><br>
-                    🔹 <strong>الگوریتم:</strong> AES-GCM (256-bit) - این الگوریتم اگر پیام در طول مسیر حتی یک نقطه تغییر کرده باشد، آن را باز نمی‌کند (ضد دستکاری).
-                    <br>
-                    🔹 <strong>کلیدسازی:</strong> PBKDF2 با ۱۰۰,۰۰۰ بار تکرار و Salt تصادفی (ضد حملات هکری).
-                    <br>
-                    🔹 <strong>بدون سرور:</strong> تمام عملیات در گوشی شما انجام می‌شود.
-                </p>
+                <ul style="list-style-type: none; padding: 0;">
+                    <li style="margin-bottom: 10px;">🚫 <strong>فراموشی رمز:</strong> مساوی است با از دست رفتن همیشگی اطلاعات. ما هیچ نسخه‌ای نداریم.</li>
+                    <li style="margin-bottom: 10px;">⌨️ <strong>کیبورد:</strong> از کیبورد امن (Incognito) یا Gboard در حالت ناشناس استفاده کنید تا کلمات ذخیره نشوند.</li>
+                    <li>📋 <strong>کلیپ‌بورد:</strong> پس از ارسال، حافظه کپی گوشی را با کپی کردن یک متن دیگر پاک کنید.</li>
+                </ul>
             </div>
         </details>
 
         <details>
-            <summary><i class="fas fa-scale-balanced" style="color: var(--danger);"></i> شرایط استفاده و سلب مسئولیت</summary>
+            <summary><i class="fas fa-scale-balanced" style="color: var(--text-muted);"></i> سلب مسئولیت</summary>
             <div class="info-content">
-                <p style="margin-top: 0;">این نرم‌افزار یک پروژه <strong>متن‌باز (Open Source)</strong> است که با هدف ارتقای حریم خصوصی توسعه یافته است.</p>
-                
-                <ul style="list-style-type: none; padding: 0;">
-                    <li style="margin-bottom: 12px;">
-                        📵 <strong>هیچ سروری وجود ندارد:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">تمام عملیات رمزنگاری در دستگاه شما انجام می‌شود. ما هیچ دسترسی‌ای به پیام‌ها، رمزها یا اطلاعات شما نداریم.</span>
-                    </li>
-                    <li style="margin-bottom: 12px;">
-                        🔥 <strong>غیرقابل بازگشت:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">اگر رمز عبور خود را فراموش کنید، پیام شما برای همیشه از دست رفته است. هیچ راهی (تکرار می‌کنیم: هیچ راهی) برای بازیابی وجود ندارد.</span>
-                    </li>
-                    <li style="margin-bottom: 5px;">
-                        ⚖️ <strong>مسئولیت کاربر:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">مسئولیت حفظ رمز عبور و همچنین محتوای پیام‌های تبادل شده، تماماً بر عهده کاربر است. سازنده هیچ مسئولیتی در قبال استفاده نادرست یا از دست رفتن اطلاعات ندارد.</span>
-                    </li>
-                </ul>
+                <p>این برنامه هیچ سروری ندارد و تمام عملیات در مرورگر شما انجام می‌شود. مسئولیت حفظ رمز عبور و محتوای پیام‌ها کاملاً بر عهده کاربر است.</p>
             </div>
         </details>
     </div>
