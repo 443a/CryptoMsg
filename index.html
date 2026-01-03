@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ابزار امن رمزنگاری متن و پنهان‌نگاری (Client-Side Encryption)">
+    <meta name="author" content="443a">
+    <meta name="theme-color" content="#0f172a">
+    
+    <title>کریپتو مسنجر | CryptoMsg</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <button id="installBtn"><i class="fas fa-download"></i> نصب اپلیکیشن</button>
+
+    <div class="header-bar">
+        <div class="app-title"><i class="fas fa-key"></i> CryptoMsg</div>
+        <div class="version-badge" onclick="updateApp()">
+            <i class="fas fa-sync-alt"></i> نسخه 3.0 (بروزرسانی)
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>پیام‌رسان سری</h2>
+
+        <div class="tabs">
+            <button id="tabEnc" class="tab-btn active enc" onclick="setMode('encrypt')">ارسال (رمزنگاری)</button>
+            <button id="tabDec" class="tab-btn" onclick="setMode('decrypt')">دریافت (رمزگشایی)</button>
+        </div>
+
+        <div id="encSettings">
+            <div class="form-group">
+                <label><i class="fas fa-layer-group"></i> روش مخفی‌سازی:</label>
+                <select id="encodingMode" onchange="toggleCoverInput()">
+                    <option value="farsiChars">حروف تصادفی فارسی (کوتاه)</option>
+                    <option value="farsiWords">جملات واقعی فارسی (طبیعی)</option>
+                    <option value="invisible">متن نامرئی / Steganography ✨</option>
+                    <option value="russian">حروف روسی (ضد فیلتر)</option>
+                    <option value="emoji">ایموجی‌ها (😂😎🚀)</option>
+                    <option value="chinese">کاراکترهای چینی</option>
+                    <option value="englishFake">انگلیسی (Fake English)</option>
+                </select>
+            </div>
+
+            <div id="coverTextInput" class="form-group">
+                <label><i class="fas fa-mask"></i> متن پوششی:</label>
+                <input type="text" id="coverText" placeholder="مثلاً: سلام چطوری؟ خوبی؟">
+                <div class="hint-text">پیام اصلی شما لابلای این متن مخفی می‌شود.</div>
+            </div>
+
+            <label class="checkbox-wrapper" for="splitOutput">
+                <input type="checkbox" id="splitOutput" checked>
+                <span class="checkbox-label">تقسیم خودکار پیام‌های طولانی (پارت‌بندی)</span>
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label id="inputLabel"><i class="fas fa-pen"></i> متن پیام:</label>
+            <textarea id="inputText" rows="3" placeholder="پیام محرمانه خود را بنویسید..." oninput="analyzeInput()"></textarea>
+        </div>
+
+        <div id="smartSuggestion" class="smart-suggestion">
+            <i class="fas fa-lightbulb"></i> <span id="suggestionText"></span>
+        </div>
+
+        <div class="form-group">
+            <div class="pass-header">
+                <label><i class="fas fa-key"></i> رمز عبور:</label>
+                <span class="gen-pass-btn" onclick="generatePassword()">
+                    <i class="fas fa-magic"></i> ساخت رمز قوی
+                </span>
+            </div>
+            
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="رمزی که فقط شما و گیرنده می‌دانید..." oninput="checkStrength()">
+                <i class="fas fa-eye password-toggle" onclick="togglePass()" id="toggleBtn"></i>
+            </div>
+
+            <div class="strength-bar"><div id="strengthFill" class="strength-fill"></div></div>
+            <div class="strength-info">
+                <span id="strengthText" class="strength-text">قدرت: وارد نشده</span>
+                <span id="crackTimeText" class="crack-time"></span>
+            </div>
+        </div>
+
+        <button id="actionBtn" class="btn-main btn-enc" onclick="process()">
+            <i class="fas fa-lock"></i> تولید پیام
+        </button>
+
+        <div id="resultArea" class="result-container">
+            <div class="stats-box">
+                <span id="charCount"></span>
+                <span id="smsCount"></span>
+            </div>
+            <div id="outputParts"></div>
+        </div>
+    </div>
+
+    <div class="info-container">
+        <details>
+            <summary><i class="fas fa-book-open"></i> راهنمای سریع</summary>
+            <div class="info-content">
+                <p><strong>ارسال:</strong> متن و رمز را وارد کنید، روش را انتخاب کنید و دکمه تولید را بزنید.</p>
+                <p><strong>دریافت:</strong> به تب دریافت بروید و متن رمز شده را وارد کنید.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary><i class="fas fa-shield-alt"></i> توصیه‌های امنیتی</summary>
+            <div class="info-content">
+                <ul>
+                    <li>رمز عبور را جداگانه (مثلاً تلفنی) به گیرنده بگویید.</li>
+                    <li>از حالت ناشناس (Incognito) مرورگر استفاده کنید.</li>
+                    <li>برای امنیت ۱۰۰٪، هنگام رمزنگاری اینترنت را قطع کنید.</li>
+                </ul>
+            </div>
+        </details>
+
+        <details open>
+            <summary><i class="fas fa-code"></i> مکانیزم و سلب مسئولیت</summary>
+            <div class="info-content">
+                <p>این ابزار <strong>Open Source</strong> و مبتنی بر رمزنگاری سمت کاربر (Client-Side) است. هیچ داده‌ای به هیچ سروری ارسال نمی‌شود. مسئولیت استفاده بر عهده کاربر است.</p>
+            </div>
+        </details>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
