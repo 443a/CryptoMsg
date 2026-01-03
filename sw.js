@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crypto-msg-v3.2'; 
+const CACHE_NAME = 'crypto-msg-v4.0'; 
 
 const ASSETS = [
   './',
@@ -6,7 +6,6 @@ const ASSETS = [
   './manifest.json',
   './assets/css/style.css',
   './assets/js/app.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js',
   'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];

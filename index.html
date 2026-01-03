@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ابزار امن رمزنگاری متن و پنهان‌نگاری (Client-Side Encryption)">
+    <meta name="description" content="ابزار امن رمزنگاری متن و پنهان‌نگاری (Web Crypto API)">
     <meta name="author" content="443a">
     <meta name="theme-color" content="#0f172a">
     
@@ -21,9 +21,9 @@
     <button id="installBtn"><i class="fas fa-download"></i> نصب اپلیکیشن</button>
 
     <div class="header-bar">
-        <div class="app-title"><i class="fas fa-key"></i> CryptoMsg</div>
+        <div class="app-title"><i class="fas fa-shield-halved"></i> CryptoMsg <small style="font-size:0.6em; opacity:0.7; margin-right:5px;">Pro</small></div>
         <div class="version-badge" onclick="updateApp()">
-            <i class="fas fa-sync-alt"></i> نسخه 3.2 (بروزرسانی)
+            <i class="fas fa-sync-alt"></i> نسخه 4.0 (هسته جدید)
         </div>
     </div>
 
@@ -39,8 +39,9 @@
             <div class="form-group">
                 <label><i class="fas fa-layer-group"></i> روش مخفی‌سازی:</label>
                 <select id="encodingMode" onchange="toggleCoverInput()">
-                    <option value="farsiChars">حروف تصادفی فارسی (کوتاه)</option>
-                    <option value="farsiWords">جملات واقعی فارسی (طبیعی)</option>
+                    <option value="base64">استاندارد (Base64)</option>
+                    <option value="farsiChars">حروف تصادفی فارسی</option>
+                    <option value="farsiWords">جملات واقعی فارسی</option>
                     <option value="invisible">متن نامرئی / Steganography ✨</option>
                     <option value="russian">حروف روسی (ضد فیلتر)</option>
                     <option value="emoji">ایموجی‌ها (😂😎🚀)</option>
@@ -79,7 +80,7 @@
             </div>
             
             <div class="password-wrapper">
-                <input type="password" id="password" placeholder="رمزی که فقط شما و گیرنده می‌دانید..." oninput="checkStrength()">
+                <input type="password" id="password" placeholder="حداقل ۱۲ کاراکتر..." oninput="checkStrength()">
                 <i class="fas fa-eye password-toggle" onclick="togglePass()" id="toggleBtn"></i>
             </div>
 
@@ -91,7 +92,7 @@
         </div>
 
         <button id="actionBtn" class="btn-main btn-enc" onclick="process()">
-            <i class="fas fa-lock"></i> تولید پیام
+            <i class="fas fa-lock"></i> تولید پیام امن
         </button>
 
         <div id="resultArea" class="result-container">
@@ -106,80 +107,38 @@
     <div class="info-container">
         
         <details>
-            <summary><i class="fas fa-book-open" style="color: var(--primary);"></i> راهنمای کامل استفاده</summary>
+            <summary><i class="fas fa-book-open" style="color: var(--primary);"></i> راهنمای سریع</summary>
             <div class="info-content">
-                <h4 style="margin-top:0; color:var(--text);">📤 ارسال پیام امن:</h4>
-                <ol style="padding-right: 20px; margin-bottom: 15px;">
-                    <li><strong>تایپ و رمزگذاری:</strong> پیام خود را بنویسید و یک "رمز عبور" تعیین کنید. (هرچه رمز طولانی‌تر، امنیت نمایی بیشتر).</li>
-                    <li><strong>انتخاب روش اختفا:</strong>
-                        <ul>
-                            <li><small>🔹 حروف تصادفی: کمترین حجم، مناسب پیامک.</small></li>
-                            <li><small>🔹 متن نامرئی: پیام شما داخل یک متن عادی (مثل "سلام") مخفی می‌شود. عالی برای توییتر/اینستاگرام.</small></li>
-                            <li><small>🔹 ایموجی/روسی: برای گیج کردن سیستم‌های نظارتی.</small></li>
-                        </ul>
-                    </li>
-                    <li><strong>تولید و کپی:</strong> دکمه تولید را بزنید. اگر متن طولانی بود، تیک "پارت‌بندی" را بزنید تا ارسال راحت‌تر شود.</li>
-                </ol>
-
-                <h4 style="color:var(--text);">📥 دریافت و خواندن:</h4>
-                <ol style="padding-right: 20px;">
-                    <li>به تب <strong>دریافت</strong> بروید.</li>
-                    <li>متن رمز شده (یا متنی که حاوی پیام مخفی است) را وارد کنید.</li>
-                    <li>همان رمز عبوری که فرستنده گذاشته بود را وارد کنید تا پیام ظاهر شود.</li>
-                </ol>
+                <p><strong>نسخه ۴.۰ (انقلاب امنیتی):</strong> ما هسته برنامه را کاملاً تغییر دادیم. حالا از استاندارد مرورگر (Web Crypto API) استفاده می‌شود که بسیار امن‌تر است.</p>
+                <p><strong>ارسال:</strong> متن و رمز را بنویسید، دکمه تولید را بزنید. خروجی حالا شامل "نمک" و "بردار" امنیتی است که به صورت خودکار مدیریت می‌شود.</p>
             </div>
         </details>
 
         <details>
-            <summary><i class="fas fa-shield-alt" style="color: var(--warning);"></i> پروتکل‌های امنیتی (حیاتی)</summary>
+            <summary><i class="fas fa-shield-alt" style="color: var(--warning);"></i> نکات امنیتی نسخه ۴</summary>
             <div class="info-content">
-                <p>برای امنیت ۱۰۰٪، رعایت نکات زیر الزامی است:</p>
-                <ul style="list-style-type: none; padding: 0;">
-                    <li style="margin-bottom: 10px;">
-                        🚫 <strong>اصل جداسازی کانال (Out-of-Band):</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">هرگز رمز عبور را در همان جایی که پیام را می‌فرستید، ارسال نکنید. (مثال صحیح: پیام رمز شده در تلگرام، رمز عبور در تماس تلفنی یا حضوری).</span>
-                    </li>
-                    <li style="margin-bottom: 10px;">
-                        ⌨️ <strong>خطر کیبوردها:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">کیبوردهای هوشمند (Gboard/SwiftKey) کلمات شما را برای یادگیری ذخیره می‌کنند. هنگام تایپ پیام‌های فوق‌سری، از کیبوردهای آفلاین استفاده کنید.</span>
-                    </li>
-                    <li style="margin-bottom: 10px;">
-                        📋 <strong>پاکسازی کلیپ‌بورد:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">پس از کپی و ارسال پیام، حتماً یک متن بی‌معنی دیگر کپی کنید تا محتوای اصلی از حافظه موقت گوشی پاک شود.</span>
-                    </li>
-                    <li style="margin-bottom: 10px;">
-                        🔌 <strong>پروتکل Air-Gap:</strong> <br>
-                        <span style="font-size: 0.85rem; color: #94a3b8;">برای نهایت امنیت، دکمه "نصب اپلیکیشن" را بزنید، اینترنت گوشی را قطع کنید، عملیات را انجام دهید و برنامه را ببندید. این ابزار کاملاً آفلاین است.</span>
-                    </li>
+                <ul>
+                    <li>✅ <strong>ضد دستکاری (Tamper Proof):</strong> اگر حتی یک حرف از پیام رمز شده تغییر کند، رمزگشایی انجام نمی‌شود (AES-GCM).</li>
+                    <li>✅ <strong>ضد بروت‌فورس:</strong> رمز عبور شما ۱۰۰،۰۰۰ بار در هم آمیخته می‌شود تا هک کردن آن زمان‌بر شود (PBKDF2).</li>
+                    <li>🚫 <strong>رمزهای قدیمی:</strong> پیام‌هایی که با نسخه‌های قبلی (۱ تا ۳) رمز شده‌اند، با این نسخه باز نمی‌شوند (چون امنیتشان پایین بود).</li>
                 </ul>
             </div>
         </details>
 
         <details open>
-            <summary><i class="fas fa-code" style="color: var(--success);"></i> شفافیت فنی و سلب مسئولیت</summary>
+            <summary><i class="fas fa-code" style="color: var(--success);"></i> شفافیت فنی</summary>
             <div class="info-content">
-                <p><strong>معماری Zero-Knowledge (دانش صفر):</strong></p>
-                <p style="text-align: justify;">
-                    این نرم‌افزار بر پایه استاندارد رمزنگاری نظامی <strong>AES-256</strong> طراحی شده است. تمام عملیات ریاضی در "مرورگر شما" (Client-Side) انجام می‌شود.
-                    <br>
-                    🔹 <strong>هیچ سروری وجود ندارد:</strong> ما هیچ دیتابیس یا سروری برای ذخیره پیام‌های شما نداریم.
-                    <br>
-                    🔹 <strong>متن نامرئی (Steganography):</strong> در این حالت، بیت‌های پیام رمز شده به کاراکترهای یونیکد "بدون عرض" (Zero-Width Characters) تبدیل شده و لابلای متن پوششی قرار می‌گیرند.
-                </p>
-                
-                <hr style="border-color: var(--border); margin: 15px 0;">
-                
-                <p><strong>سلب مسئولیت قانونی:</strong></p>
-                <p style="text-align: justify; font-size: 0.8rem; color: #94a3b8;">
-                    ۱. این پروژه متن‌باز (Open Source) بوده و صرفاً جهت ارتقای حریم خصوصی توسعه یافته است.
-                    <br>۲. از آنجا که هیچ دیتایی ذخیره نمی‌شود، <strong>بازیابی رمز عبور غیرممکن است</strong>. فراموشی رمز = از دست رفتن دائمی اطلاعات.
-                    <br>۳. مسئولیت قانونی نحوه استفاده از این ابزار تماماً بر عهده کاربر نهایی است.
-                </p>
+                <p><strong>مشخصات فنی نسخه ۴.۰:</strong></p>
+                <ul style="font-size: 0.85rem; direction: ltr; text-align: left;">
+                    <li><strong>Algorithm:</strong> AES-GCM (256-bit)</li>
+                    <li><strong>Key Derivation:</strong> PBKDF2-SHA256 (100,000 Iterations)</li>
+                    <li><strong>Salt & IV:</strong> Randomly generated for every message</li>
+                    <li><strong>Library:</strong> Native Web Crypto API (No 3rd party scripts)</li>
+                </ul>
             </div>
         </details>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
 </html>
