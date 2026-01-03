@@ -63,7 +63,7 @@
 | :--- | :--- | :--- |
 | **Encryption** | `AES-GCM` (256-bit) | رمزنگاری با تایید اصالت (Authenticated Encryption) |
 | **Key Derivation** | `PBKDF2` | با الگوریتم HMAC-SHA256 |
-| **Iterations** | `100,000` | تعداد تکرار هش برای کند کردن حملات آفلاین |
+| **Iterations** | `600,000` | تعداد تکرار هش برای کند کردن حملات آفلاین |
 | **Randomness** | `CSPRNG` | استفاده از `crypto.getRandomValues` برای تولید Salt و IV |
 
 
