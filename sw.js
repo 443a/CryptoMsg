@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crypto-msg-v4.0'; 
+const CACHE_NAME = 'crypto-msg-v4.1'; 
 
 const ASSETS = [
   './',

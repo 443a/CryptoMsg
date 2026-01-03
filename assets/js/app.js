@@ -1,4 +1,4 @@
-// --- دیکشنری‌ها برای Encoding (تغییر ظاهری) ---
+// --- دیکشنری‌ها ---
 const dictionaries = {
     base64: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split(''),
     farsiChars: ['ا','ب','پ','ت','ث','ج','چ','ح','خ','د','ذ','ر','ز','ژ','س','ش','ص','ض','ط','ظ','ع','غ','f','ق','k','گ','ل','م','ن','و','ه','ی','آ','أ','ؤ','إ','ة','ک','ى','ء','۰','۱','۲','۳','۴','۵','۶','۷','۸','۹','،','؛','?','!','@','#','$','%','^','&','*','(',')','='],
@@ -12,78 +12,47 @@ const dictionaries = {
 const zwChars = ['\u200C', '\u200D', '\uFEFF', '\u2060']; 
 let currentMode = 'encrypt';
 
-// ==========================================
-// 🔒 بخش جدید و قدرتمند رمزنگاری (Web Crypto API)
-// ==========================================
-
-// تبدیل رشته به بافر و برعکس
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
-// تولید کلید از پسورد (PBKDF2)
+// --- توابع رمزنگاری (Web Crypto API) ---
 async function getKeyMaterial(password) {
-    return window.crypto.subtle.importKey(
-        "raw",
-        enc.encode(password),
-        { name: "PBKDF2" },
-        false,
-        ["deriveBits", "deriveKey"]
-    );
+    return window.crypto.subtle.importKey("raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveBits", "deriveKey"]);
 }
 
 async function getKey(keyMaterial, salt) {
     return window.crypto.subtle.deriveKey(
-        {
-            name: "PBKDF2",
-            salt: salt,
-            iterations: 100000, // 100k Iterations for security
-            hash: "SHA-256"
-        },
-        keyMaterial,
-        { name: "AES-GCM", length: 256 },
-        true,
-        ["encrypt", "decrypt"]
+        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+        keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]
     );
 }
 
-// تابع اصلی رمزنگاری
 async function encryptData(text, password) {
-    try {
-        const salt = window.crypto.getRandomValues(new Uint8Array(16)); // نمک تصادفی
-        const iv = window.crypto.getRandomValues(new Uint8Array(12)); // بردار اولیه تصادفی
-        
-        const keyMaterial = await getKeyMaterial(password);
-        const key = await getKey(keyMaterial, salt);
-        
-        const encodedText = enc.encode(text);
-        const encryptedContent = await window.crypto.subtle.encrypt(
-            { name: "AES-GCM", iv: iv },
-            key,
-            encodedText
-        );
+    const salt = window.crypto.getRandomValues(new Uint8Array(16));
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const keyMaterial = await getKeyMaterial(password);
+    const key = await getKey(keyMaterial, salt);
+    const encryptedContent = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, enc.encode(text));
 
-        // بسته‌بندی داده‌ها (Salt + IV + Ciphertext)
-        // تبدیل به Base64 برای انتقال راحت
-        const combinedData = {
-            s: arrayBufferToBase64(salt),
-            i: arrayBufferToBase64(iv),
-            c: arrayBufferToBase64(encryptedContent)
-        };
-        
-        // تبدیل آبجکت به رشته JSON و سپس Base64 نهایی
-        return btoa(JSON.stringify(combinedData));
-    } catch (e) {
-        console.error(e);
-        throw new Error("Encryption Failed");
-    }
+    return btoa(JSON.stringify({
+        s: arrayBufferToBase64(salt),
+        i: arrayBufferToBase64(iv),
+        c: arrayBufferToBase64(encryptedContent)
+    }));
 }
 
-// تابع اصلی رمزگشایی
 async function decryptData(packedData, password) {
     try {
-        // باز کردن بسته
-        const dataObj = JSON.parse(atob(packedData));
+        // تمیزکاری ورودی
+        const cleanData = packedData.trim();
+        const decodedString = atob(cleanData);
         
+        // تشخیص پیام‌های نسخه قدیمی (v3)
+        if (decodedString.startsWith('Salted__')) {
+            throw new Error("LEGACY_VERSION");
+        }
+
+        const dataObj = JSON.parse(decodedString);
         const salt = base64ToArrayBuffer(dataObj.s);
         const iv = base64ToArrayBuffer(dataObj.i);
         const ciphertext = base64ToArrayBuffer(dataObj.c);
@@ -91,98 +60,58 @@ async function decryptData(packedData, password) {
         const keyMaterial = await getKeyMaterial(password);
         const key = await getKey(keyMaterial, salt);
         
-        const decryptedContent = await window.crypto.subtle.decrypt(
-            { name: "AES-GCM", iv: iv },
-            key,
-            ciphertext
-        );
-        
+        const decryptedContent = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ciphertext);
         return dec.decode(decryptedContent);
     } catch (e) {
-        console.error(e);
-        throw new Error("Decryption Failed or Tampered");
+        if (e.message === "LEGACY_VERSION") throw e;
+        console.error("Decryption low-level error:", e);
+        throw new Error("DECRYPT_FAIL");
     }
 }
 
-// ابزارهای تبدیل بافر/بیس۶۴
 function arrayBufferToBase64(buffer) {
     let binary = '';
     const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) binary += String.fromCharCode(bytes[i]);
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
     return window.btoa(binary);
 }
 
 function base64ToArrayBuffer(base64) {
     const binary_string = window.atob(base64);
-    const len = binary_string.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) bytes[i] = binary_string.charCodeAt(i);
+    const bytes = new Uint8Array(binary_string.length);
+    for (let i = 0; i < binary_string.length; i++) bytes[i] = binary_string.charCodeAt(i);
     return bytes.buffer;
 }
 
-// ==========================================
-// 🎮 منطق رابط کاربری (UI Logic)
-// ==========================================
-
+// --- منطق UI ---
 function setMode(mode) {
     currentMode = mode;
-    const els = {
-        encSet: document.getElementById('encSettings'),
-        actBtn: document.getElementById('actionBtn'),
-        lbl: document.getElementById('inputLabel'),
-        tabEnc: document.getElementById('tabEnc'),
-        tabDec: document.getElementById('tabDec'),
-        res: document.getElementById('resultArea'),
-        inp: document.getElementById('inputText')
-    };
-    
-    els.inp.value = '';
-    els.res.style.display = 'none';
-    document.getElementById('smartSuggestion').style.display = 'none';
+    const els = { encSet: document.getElementById('encSettings'), actBtn: document.getElementById('actionBtn'), lbl: document.getElementById('inputLabel'), tabEnc: document.getElementById('tabEnc'), tabDec: document.getElementById('tabDec'), res: document.getElementById('resultArea'), inp: document.getElementById('inputText') };
+    els.inp.value = ''; els.res.style.display = 'none'; document.getElementById('smartSuggestion').style.display = 'none';
 
     if(mode === 'encrypt') {
-        els.tabEnc.className = 'tab-btn active enc';
-        els.tabDec.className = 'tab-btn';
-        els.encSet.style.display = 'block';
-        els.actBtn.innerHTML = '<i class="fas fa-lock"></i> تولید پیام امن';
-        els.actBtn.className = 'btn-main btn-enc';
-        els.lbl.innerHTML = '<i class="fas fa-pen"></i> متن پیام:';
+        els.tabEnc.className = 'tab-btn active enc'; els.tabDec.className = 'tab-btn'; els.encSet.style.display = 'block';
+        els.actBtn.innerHTML = '<i class="fas fa-lock"></i> تولید پیام امن'; els.actBtn.className = 'btn-main btn-enc'; els.lbl.innerHTML = '<i class="fas fa-pen"></i> متن پیام:';
     } else {
-        els.tabEnc.className = 'tab-btn';
-        els.tabDec.className = 'tab-btn active dec';
-        els.encSet.style.display = 'none';
-        els.actBtn.innerHTML = '<i class="fas fa-unlock"></i> رمزگشایی پیام';
-        els.actBtn.className = 'btn-main btn-dec';
-        els.lbl.innerHTML = '<i class="fas fa-paste"></i> متن رمز شده (کپی کنید):';
+        els.tabEnc.className = 'tab-btn'; els.tabDec.className = 'tab-btn active dec'; els.encSet.style.display = 'none';
+        els.actBtn.innerHTML = '<i class="fas fa-unlock"></i> رمزگشایی پیام'; els.actBtn.className = 'btn-main btn-dec'; els.lbl.innerHTML = '<i class="fas fa-paste"></i> متن رمز شده (کپی کنید):';
     }
 }
 
 function toggleCoverInput() {
-    const mode = document.getElementById('encodingMode').value;
-    const coverInput = document.getElementById('coverTextInput');
-    coverInput.style.display = (mode === 'invisible') ? 'block' : 'none';
+    document.getElementById('coverTextInput').style.display = (document.getElementById('encodingMode').value === 'invisible') ? 'block' : 'none';
 }
 
 function analyzeInput() {
     const text = document.getElementById('inputText').value;
-    const suggestionBox = document.getElementById('smartSuggestion');
-    const suggestionText = document.getElementById('suggestionText');
-    
-    if (currentMode !== 'encrypt' || text.length < 3) {
-        suggestionBox.style.display = 'none';
-        return;
-    }
-
-    suggestionBox.style.display = 'block';
-    let msg = "";
-    if (text.length < 50) msg = `متن کوتاه است. برای پیامک، <span class="suggestion-tag">حروف تصادفی فارسی</span> عالی است.`;
-    else if (text.length > 500) msg = `متن طولانی است. برای جلوگیری از مسدودی، از <span class="suggestion-tag">کلمات فارسی</span> یا <span class="suggestion-tag">حروف روسی</span> استفاده کنید.`;
-    else msg = `برای مخفی‌کاری در توییتر/اینستاگرام، بهترین گزینه <span class="suggestion-tag">متن نامرئی</span> است.`;
-    suggestionText.innerHTML = msg;
+    const box = document.getElementById('smartSuggestion');
+    if (currentMode !== 'encrypt' || text.length < 3) { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    let msg = text.length < 50 ? "متن کوتاه است. برای پیامک، <span class='suggestion-tag'>حروف تصادفی فارسی</span> عالی است." : "برای توییتر/اینستاگرام، <span class='suggestion-tag'>متن نامرئی</span> پیشنهاد می‌شود.";
+    document.getElementById('suggestionText').innerHTML = msg;
 }
 
-// --- پردازش اصلی (Process) ---
+// --- پردازش اصلی (اصلاح شده) ---
 async function process() {
     const text = document.getElementById('inputText').value.trim();
     const pass = document.getElementById('password').value;
@@ -190,107 +119,81 @@ async function process() {
     const cover = document.getElementById('coverText').value.trim() || "سلام، پیام مخفی اینجاست."; 
 
     if (!text || !pass) { alert("⚠️ لطفا متن و رمز عبور را وارد کنید"); return; }
-
+    
     const btn = document.getElementById('actionBtn');
-    const originalBtnText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال پردازش...';
-    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ...'; btn.disabled = true;
 
     try {
         if (currentMode === 'encrypt') {
-            // 1. رمزنگاری با Web Crypto API
             const encryptedBase64 = await encryptData(text, pass);
-            
-            // 2. اعمال لایه مخفی‌سازی (Encoding)
             let finalStr = "";
-            if (mode === 'invisible') {
-                finalStr = textToInvisible(encryptedBase64, cover);
-            } else if (mode === 'base64') {
-                finalStr = encryptedBase64;
-            } else {
-                finalStr = mapToDictionary(encryptedBase64, mode);
-            }
-            
+            if (mode === 'invisible') finalStr = textToInvisible(encryptedBase64, cover);
+            else if (mode === 'base64') finalStr = encryptedBase64;
+            else finalStr = mapToDictionary(encryptedBase64, mode);
             displayOutput(finalStr, mode);
         } else {
-            // 1. برداشتن لایه مخفی‌سازی
             let base64Cipher = "";
             
+            // تشخیص هوشمند فرمت ورودی
             if (hasInvisibleChars(text)) {
                 base64Cipher = invisibleToText(text);
-            } else if (isBase64(text)) {
-                base64Cipher = text;
+            } else if (looksLikeV4JSON(text)) {
+                // اگر متن شبیه JSON نسخه ۴ است (با ey شروع می‌شود)
+                base64Cipher = text; 
             } else {
                 let detectedMode = detectMode(text);
                 base64Cipher = mapFromDictionary(text, detectedMode);
             }
 
-            // 2. رمزگشایی با Web Crypto API
             const decrypted = await decryptData(base64Cipher, pass);
-            
             document.getElementById('outputParts').innerHTML = `<div class="result-part"><button class="copy-btn" onclick="copyText(this)">کپی</button><div class="result-text">${decrypted}</div></div>`;
             document.getElementById('resultArea').style.display = 'block';
-            document.getElementById('charCount').innerText = ""; 
-            document.getElementById('smsCount').innerText = "";
         }
     } catch (e) {
-        console.error(e);
-        alert("❌ خطا: رمز عبور اشتباه است یا پیام دستکاری شده است.");
+        if (e.message === "LEGACY_VERSION") {
+            alert("⚠️ خطا: این پیام با نسخه قدیمی (v3) رمز شده است و با نسخه ۴ باز نمی‌شود.");
+        } else {
+            alert("❌ خطا: رمز عبور اشتباه است یا متن ورودی معتبر نیست.");
+        }
     } finally {
-        btn.innerHTML = originalBtnText;
-        btn.disabled = false;
+        btn.innerHTML = originalText; btn.disabled = false;
     }
 }
 
-// --- توابع کمکی (Helpers) ---
-
-function isBase64(str) {
-    try { return btoa(atob(str)) == str; } catch (err) { return false; }
+// --- توابع کمکی ---
+function looksLikeV4JSON(str) {
+    // چک ساده: آیا با ey شروع می‌شود؟ (نشانه Base64 برای { )
+    // و آیا کاراکترهای مجاز Base64 دارد؟
+    const clean = str.trim();
+    if (!clean.startsWith('ey')) return false;
+    try { return btoa(atob(clean)) == clean; } catch(e) { return false; }
 }
 
-function textToInvisible(base64, coverText) {
+function textToInvisible(base64, cover) {
     let binary = "";
     for (let i = 0; i < base64.length; i++) {
         let bin = base64.charCodeAt(i).toString(2);
         binary += "0".repeat(8 - bin.length) + bin;
     }
     let invisibleStr = "";
-    for (let i = 0; i < binary.length; i += 2) {
-        let chunk = binary.substr(i, 2);
-        if (chunk.length < 2) chunk += "0"; 
-        let idx = parseInt(chunk, 2);
-        invisibleStr += zwChars[idx];
-    }
-    const mid = Math.floor(coverText.length / 2);
-    return coverText.slice(0, mid) + invisibleStr + coverText.slice(mid);
+    for (let i = 0; i < binary.length; i += 2) invisibleStr += zwChars[parseInt(binary.substr(i, 2), 2)];
+    const mid = Math.floor(cover.length / 2);
+    return cover.slice(0, mid) + invisibleStr + cover.slice(mid);
 }
 
 function invisibleToText(str) {
     let invisiblePart = "";
-    for (let char of str) {
-        if (zwChars.includes(char)) invisiblePart += char;
-    }
+    for (let char of str) if (zwChars.includes(char)) invisiblePart += char;
     if (invisiblePart.length === 0) throw new Error("No invisible chars");
     let binary = "";
-    for (let char of invisiblePart) {
-        let idx = zwChars.indexOf(char);
-        let bin = idx.toString(2);
-        binary += "0".repeat(2 - bin.length) + bin;
-    }
+    for (let char of invisiblePart) binary += zwChars.indexOf(char).toString(2).padStart(2, '0');
     let base64 = "";
-    for (let i = 0; i < binary.length; i += 8) {
-        let byte = binary.substr(i, 8);
-        if (byte.length === 8) {
-            base64 += String.fromCharCode(parseInt(byte, 2));
-        }
-    }
+    for (let i = 0; i < binary.length; i += 8) base64 += String.fromCharCode(parseInt(binary.substr(i, 8), 2));
     return base64;
 }
 
-function hasInvisibleChars(text) {
-    for (let char of text) if (zwChars.includes(char)) return true;
-    return false;
-}
+function hasInvisibleChars(text) { for (let char of text) if (zwChars.includes(char)) return true; return false; }
 
 function mapToDictionary(base64, modeName) {
     const targetDict = dictionaries[modeName];
@@ -298,8 +201,7 @@ function mapToDictionary(base64, modeName) {
     let res = [];
     for (let char of base64) {
         if (char === '=') continue; 
-        let idx = dictionaries.base64.indexOf(char);
-        res.push(targetDict[idx]);
+        res.push(targetDict[dictionaries.base64.indexOf(char)]);
     }
     let str = isWordBased ? res.join(" ") : res.join("");
     if (!isWordBased && modeName !== 'chinese' && modeName !== 'emoji') str = addRandomSpaces(str);
@@ -324,10 +226,10 @@ function mapFromDictionary(text, modeName) {
 }
 
 function detectMode(text) {
-    const firstToken = text.trim().split(/\s+/)[0];
-    const firstChar = Array.from(text.trim())[0];
-    if (dictionaries.farsiWords.includes(firstToken)) return 'farsiWords';
-    if (dictionaries.englishFake.includes(firstToken)) return 'englishFake';
+    const t = text.trim();
+    if (dictionaries.farsiWords.includes(t.split(/\s+/)[0])) return 'farsiWords';
+    if (dictionaries.englishFake.includes(t.split(/\s+/)[0])) return 'englishFake';
+    const firstChar = Array.from(t)[0];
     if (dictionaries.emoji.includes(firstChar)) return 'emoji';
     if (dictionaries.chinese.includes(firstChar)) return 'chinese';
     if (dictionaries.russian.includes(firstChar)) return 'russian';
@@ -344,151 +246,50 @@ function addRandomSpaces(str) {
 }
 
 function displayOutput(text, mode) {
-    const outputDiv = document.getElementById('outputParts');
-    const charLen = Array.from(text).length;
-    let smsCount = Math.ceil(charLen / 70);
-    if (mode === 'englishFake') smsCount = Math.ceil(charLen / 160);
-
-    document.getElementById('charCount').innerText = `${charLen} کاراکتر`;
-    document.getElementById('smsCount').innerText = `~${smsCount} پیامک`;
-
-    outputDiv.innerHTML = '';
+    const out = document.getElementById('outputParts');
+    const len = Array.from(text).length;
+    document.getElementById('charCount').innerText = `${len} کاراکتر`;
+    document.getElementById('smsCount').innerText = `~${Math.ceil(len / (mode === 'englishFake' ? 160 : 70))} پیامک`;
+    
+    out.innerHTML = '';
     const doSplit = document.getElementById('splitOutput').checked;
-    const splitLimit = 500; 
-
-    if (doSplit && charLen > splitLimit) {
-        let parts = splitString(text, splitLimit); 
-        parts.forEach((part, index) => {
-            let html = `<div class="result-part"><span style="color:var(--primary); font-size:0.8rem; display:block; margin-bottom:5px;">بخش ${index + 1} از ${parts.length}</span><button class="copy-btn" onclick="copyText(this)">کپی</button><div class="result-text">${part}</div></div>`;
-            outputDiv.innerHTML += html;
-        });
+    
+    if (doSplit && len > 500) {
+        const chars = Array.from(text);
+        for (let i = 0; i < chars.length; i += 500) {
+            let part = chars.slice(i, i + 500).join("");
+            out.innerHTML += `<div class="result-part"><span style="color:var(--primary); font-size:0.8rem; display:block; margin-bottom:5px;">بخش ${Math.floor(i/500) + 1}</span><button class="copy-btn" onclick="copyText(this)">کپی</button><div class="result-text">${part}</div></div>`;
+        }
     } else {
-        outputDiv.innerHTML = `<div class="result-part"><button class="copy-btn" onclick="copyText(this)">کپی کامل</button><div class="result-text">${text}</div></div>`;
+        out.innerHTML = `<div class="result-part"><button class="copy-btn" onclick="copyText(this)">کپی کامل</button><div class="result-text">${text}</div></div>`;
     }
     document.getElementById('resultArea').style.display = 'block';
 }
 
-function splitString(str, len) {
-    const chars = Array.from(str);
-    let parts = [];
-    for (let i = 0; i < chars.length; i += len) parts.push(chars.slice(i, i + len).join(""));
-    return parts;
-}
-
 function copyText(btn) {
-    const text = btn.parentElement.querySelector('.result-text').innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        let original = btn.innerText; btn.innerText = "کپی شد!";
-        setTimeout(() => btn.innerText = original, 2000);
+    navigator.clipboard.writeText(btn.parentElement.querySelector('.result-text').innerText).then(() => {
+        let t = btn.innerText; btn.innerText = "کپی شد!"; setTimeout(() => btn.innerText = t, 2000);
     });
 }
 
 function generatePassword() {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-    let password = "";
-    const array = new Uint32Array(20);
-    window.crypto.getRandomValues(array);
-    for (let i = 0; i < 20; i++) {
-        password += chars[array[i] % chars.length];
-    }
-    const input = document.getElementById('password');
-    input.value = password;
-    input.type = "text"; 
-    document.getElementById('toggleBtn').className = "fas fa-eye-slash password-toggle";
-    checkStrength();
+    const arr = new Uint32Array(20); window.crypto.getRandomValues(arr);
+    let pass = ""; for(let i=0; i<20; i++) pass += chars[arr[i] % chars.length];
+    document.getElementById('password').value = pass; checkStrength();
 }
-
 function togglePass() {
-    const input = document.getElementById('password');
-    const icon = document.getElementById('toggleBtn');
-    if (input.type === "password") {
-        input.type = "text";
-        icon.className = "fas fa-eye-slash password-toggle";
-    } else {
-        input.type = "password";
-        icon.className = "fas fa-eye password-toggle";
-    }
+    const inp = document.getElementById('password'); inp.type = inp.type === "password" ? "text" : "password";
 }
-
 function checkStrength() {
     const val = document.getElementById('password').value;
-    const fill = document.getElementById('strengthFill');
-    const txt = document.getElementById('strengthText');
-    const crackTimeEl = document.getElementById('crackTimeText');
-    
-    let strength = 0;
-    if(val.length > 0) strength = 1; 
-    if(val.length > 4) strength++;
-    if(val.length > 8) strength++;
-    if(/[A-Z]/.test(val)) strength++;
-    if(/[0-9]/.test(val)) strength++;
-    if(/[^A-Za-z0-9]/.test(val)) strength++;
-    
-    let colors = ['transparent', '#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981', '#3b82f6'];
-    let texts = ['وارد نشده', 'خیلی ضعیف', 'ضعیف', 'متوسط', 'خوب', 'عالی', 'فوق امن'];
-    
-    let charsetSize = 0;
-    if(/[a-z]/.test(val)) charsetSize += 26;
-    if(/[A-Z]/.test(val)) charsetSize += 26;
-    if(/[0-9]/.test(val)) charsetSize += 10;
-    if(/[^A-Za-z0-9]/.test(val)) charsetSize += 30;
-
-    let timeText = "";
-    if (val.length === 0) {
-        fill.style.width = '0%';
-        txt.innerText = 'قدرت: وارد نشده';
-        txt.style.color = '#64748b';
-        crackTimeEl.innerText = "";
-    } else {
-        let combinations = Math.pow(charsetSize, val.length);
-        let seconds = combinations / 1000000000; 
-        
-        if (seconds < 1) timeText = "هک: لحظه‌ای! 😱";
-        else if (seconds < 60) timeText = `هک: ${Math.round(seconds)} ثانیه ⚠️`;
-        else if (seconds < 3600) timeText = `هک: ${Math.round(seconds/60)} دقیقه ⚠️`;
-        else if (seconds < 86400) timeText = `هک: ${Math.round(seconds/3600)} ساعت`;
-        else if (seconds < 31536000) timeText = `هک: ${Math.round(seconds/86400)} روز`;
-        else if (seconds < 3153600000) timeText = `هک: ${Math.round(seconds/31536000)} سال ✅`;
-        else timeText = "هک: قرن‌ها (غیرممکن) 🛡️";
-
-        let idx = Math.min(strength, 6);
-        fill.style.width = (idx * 16.6) + '%'; 
-        fill.style.background = colors[idx]; 
-        txt.innerText = 'قدرت: ' + texts[idx]; 
-        txt.style.color = colors[idx];
-        
-        crackTimeEl.innerText = timeText;
-        crackTimeEl.style.color = (seconds < 86400) ? '#ef4444' : '#10b981';
-    }
+    const bar = document.getElementById('strengthFill');
+    if(!val) { bar.style.width = '0%'; return; }
+    let s = 0; if(val.length > 8) s++; if(/[A-Z]/.test(val)) s++; if(/[0-9]/.test(val)) s++; if(/[^A-Za-z0-9]/.test(val)) s++;
+    bar.style.width = Math.min((s+1)*25, 100) + '%'; 
+    bar.style.background = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6'][Math.min(s, 3)];
 }
-
-// PWA Logic
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    const installBtn = document.getElementById('installBtn');
-    installBtn.style.display = 'block';
-    installBtn.addEventListener('click', () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-    });
-});
-
-function updateApp() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) registration.unregister();
-            alert("کش برنامه پاک شد. صفحه ریلود می‌شود...");
-            window.location.reload(true);
-        });
-    } else {
-        window.location.reload(true);
-    }
-}
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js');
-    });
-}
+// PWA
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBtn').style.display = 'block'; });
+document.getElementById('installBtn').addEventListener('click', () => { document.getElementById('installBtn').style.display = 'none'; deferredPrompt.prompt(); });
