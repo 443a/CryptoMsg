@@ -43,11 +43,9 @@ async function encryptData(text, password) {
 
 async function decryptData(packedData, password) {
     try {
-        // تمیزکاری ورودی
         const cleanData = packedData.trim();
         const decodedString = atob(cleanData);
         
-        // تشخیص پیام‌های نسخه قدیمی (v3)
         if (decodedString.startsWith('Salted__')) {
             throw new Error("LEGACY_VERSION");
         }
@@ -111,7 +109,7 @@ function analyzeInput() {
     document.getElementById('suggestionText').innerHTML = msg;
 }
 
-// --- پردازش اصلی (اصلاح شده) ---
+// --- پردازش اصلی ---
 async function process() {
     const text = document.getElementById('inputText').value.trim();
     const pass = document.getElementById('password').value;
@@ -135,11 +133,9 @@ async function process() {
         } else {
             let base64Cipher = "";
             
-            // تشخیص هوشمند فرمت ورودی
             if (hasInvisibleChars(text)) {
                 base64Cipher = invisibleToText(text);
             } else if (looksLikeV4JSON(text)) {
-                // اگر متن شبیه JSON نسخه ۴ است (با ey شروع می‌شود)
                 base64Cipher = text; 
             } else {
                 let detectedMode = detectMode(text);
@@ -163,8 +159,6 @@ async function process() {
 
 // --- توابع کمکی ---
 function looksLikeV4JSON(str) {
-    // چک ساده: آیا با ey شروع می‌شود؟ (نشانه Base64 برای { )
-    // و آیا کاراکترهای مجاز Base64 دارد؟
     const clean = str.trim();
     if (!clean.startsWith('ey')) return false;
     try { return btoa(atob(clean)) == clean; } catch(e) { return false; }
@@ -289,7 +283,32 @@ function checkStrength() {
     bar.style.width = Math.min((s+1)*25, 100) + '%'; 
     bar.style.background = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6'][Math.min(s, 3)];
 }
-// PWA
+
+// --- مدیریت PWA و آپدیت (اصلاح شده) ---
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
-let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('installBtn').style.display = 'block'; });
-document.getElementById('installBtn').addEventListener('click', () => { document.getElementById('installBtn').style.display = 'none'; deferredPrompt.prompt(); });
+
+let deferredPrompt; 
+window.addEventListener('beforeinstallprompt', (e) => { 
+    e.preventDefault(); 
+    deferredPrompt = e; 
+    document.getElementById('installBtn').style.display = 'block'; 
+});
+document.getElementById('installBtn').addEventListener('click', () => { 
+    document.getElementById('installBtn').style.display = 'none'; 
+    deferredPrompt.prompt(); 
+});
+
+// تابع آپدیت:
+function updateApp() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister();
+            }
+            alert("کش برنامه پاک شد. صفحه ریلود می‌شود...");
+            window.location.reload(true);
+        });
+    } else {
+        window.location.reload(true);
+    }
+}
