@@ -127,3 +127,19 @@ details[open] summary::after { content: '-'; }
 .info-content { padding: 15px; font-size: 0.85rem; color: #cbd5e1; line-height: 1.8; border-top: 1px solid var(--border); }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Info Content Enhancements */
+.info-content ul, .info-content ol {
+    padding-right: 20px;
+    margin: 10px 0;
+}
+.info-content li {
+    margin-bottom: 8px;
+}
+.info-content h4 {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+    display: inline-block;
+}
