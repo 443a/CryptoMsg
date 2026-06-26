@@ -145,6 +145,11 @@ export class EncodingModule {
    * Map Base64 to a dictionary
    */
   mapToDictionary(base64: string, modeName: EncodingMethod): string {
+    // invisible is handled separately, not via dictionary mapping
+    if (modeName === 'invisible') {
+      return base64;
+    }
+
     const targetDict = DICTIONARIES[modeName];
     if (!targetDict) {
       throw new EncodingError(`Unknown encoding mode: ${modeName}`, 'UNKNOWN_MODE');
@@ -175,6 +180,11 @@ export class EncodingModule {
    * Map text from dictionary to Base64
    */
   mapFromDictionary(text: string, modeName: EncodingMethod): string {
+    // invisible is handled separately
+    if (modeName === 'invisible') {
+      return text;
+    }
+
     const targetDict = DICTIONARIES[modeName];
     if (!targetDict) {
       throw new EncodingError(`Unknown encoding mode: ${modeName}`, 'UNKNOWN_MODE');

@@ -4,12 +4,12 @@
  * @license MIT
  */
 
-import type { EncodingMethod, AppMode } from '../types';
+import type { EncodingMethod, AppMode, BeforeInstallPromptEvent } from '../types';
 import { Crypto, CryptoError } from '../core/crypto';
 import { Encoding, EncodingError } from '../core/encoding';
 import { AppState } from '../core/state';
 import { i18n } from '../i18n';
-import { Clipboard, Storage, QRCode } from '../services';
+import { Clipboard, Storage } from '../services';
 
 // ==========================================
 // UI MODULE

@@ -125,7 +125,14 @@ export interface MethodDetails {
  * Method details map
  */
 export interface MethodDetailsMap {
-  [key in EncodingMethod]: MethodDetails;
+  base64: MethodDetails;
+  farsiChars: MethodDetails;
+  farsiWords: MethodDetails;
+  invisible: MethodDetails;
+  russian: MethodDetails;
+  emoji: MethodDetails;
+  chinese: MethodDetails;
+  englishFake: MethodDetails;
 }
 
 /**

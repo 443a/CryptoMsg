@@ -4,7 +4,19 @@
  * @license MIT
  */
 
-import type { AppMode, Language, Theme, AppState } from '../types';
+import type { AppMode, Language, Theme } from '../types';
+
+/**
+ * Internal state shape
+ */
+interface StateShape {
+  currentMode: AppMode;
+  currentLang: Language;
+  currentTheme: Theme;
+  clipboardTimer: ReturnType<typeof setTimeout> | null;
+  autoClearEnabled: boolean;
+  isProcessing: boolean;
+}
 
 // ==========================================
 // STORAGE KEYS
@@ -21,8 +33,8 @@ const STORAGE_KEYS = {
 // STATE MANAGER
 // ==========================================
 
-export class StateManager {
-  private state: AppState;
+class StateManagerClass {
+  private state: StateShape;
 
   constructor() {
     this.state = {
@@ -195,5 +207,6 @@ export class StateManager {
 // EXPORTS
 // ==========================================
 
-export const AppState = new StateManager();
+export const AppState = new StateManagerClass();
 export { STORAGE_KEYS };
+export type { StateManagerClass as StateManager };

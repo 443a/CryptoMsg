@@ -6,7 +6,8 @@
 // Core modules
 export { Crypto, CryptoModule, CryptoError, CRYPTO_CONFIG } from './crypto';
 export { Encoding, EncodingModule, EncodingError, DICTIONARIES, ZW_CHARS } from './encoding';
-export { AppState, StateManager, STORAGE_KEYS } from './state';
+export { AppState, STORAGE_KEYS } from './state';
+export type { StateManagerClass } from './state';
 
 // Types
-export type * from './types';
+export type * from '../types';

@@ -61,7 +61,7 @@ async function deriveKey(keyMaterial: CryptoKey, salt: Uint8Array): Promise<Cryp
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt as unknown as BufferSource,
       iterations: CRYPTO_CONFIG.iterations,
       hash: CRYPTO_CONFIG.hash,
     },
@@ -79,7 +79,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
   let binary = '';
   const bytes = new Uint8Array(buffer);
   for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    binary += String.fromCharCode(bytes[i] ?? 0);
   }
   return btoa(binary);
 }
@@ -90,7 +90,7 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
   for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  return bytes.buffer;
+  return bytes.buffer as ArrayBuffer;
 }
 
 // ==========================================
@@ -146,12 +146,17 @@ async function decrypt(packedData: string, password: string): Promise<string> {
 
 function generatePassword(length: number = 24): string {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=';
+  const charsetArray = Array.from(charset);
   const randomValues = new Uint32Array(length);
   crypto.getRandomValues(randomValues);
 
   let password = '';
   for (let i = 0; i < length; i++) {
-    password += charset[randomValues[i] % charset.length];
+    const charIndex = randomValues[i] % charsetArray.length;
+    const char = charsetArray[charIndex];
+    if (char !== undefined) {
+      password += char;
+    }
   }
   return password;
 }
