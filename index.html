@@ -3,97 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="ابزار فوق امن رمزنگاری متن و پنهان‌نگاری (Web Crypto API) - AES-GCM 256-bit">
+    <meta name="description" content="CryptoMsg - ابزار فوق امن رمزنگاری متن و پنهان‌نگاری با AES-GCM 256-bit">
     <meta name="author" content="443a">
-    <meta name="keywords" content="رمزنگاری, امنیت, پنهان‌نگاری, استگانوگرافی, AES, پیام امن, CryptoMsg">
-    <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0f172a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="CryptoMsg Ultimate - رمزنگاری پیام">
-    <meta property="og:description" content="ابزار فوق امن رمزنگاری متن با AES-GCM 256-bit">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="CryptoMsg - رمزنگاری امن">
+    <meta property="og:description" content="ابزار فوق امن رمزنگاری متن و پنهان‌نگاری">
     <meta property="og:type" content="website">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="CryptoMsg Ultimate">
-    <meta name="twitter:description" content="رمزنگاری پیام با بالاترین سطح امنیت">
 
     <title>کریپتو مسنجر | CryptoMsg Ultimate</title>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
-    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
 
     <!-- Styles -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body data-theme="dark">
+<body>
 
-    <!-- Install Button -->
+    <!-- Install Button (shown when PWA installable) -->
     <button id="installBtn" aria-label="نصب اپلیکیشن">
         <i class="fas fa-download"></i> <span>نصب</span>
     </button>
 
-    <!-- Header Bar -->
+    <!-- Header -->
     <header class="header-bar">
-        <div class="header-left">
-            <div class="app-title">
-                <i class="fas fa-shield-halved"></i>
-                <span>CryptoMsg</span>
-                <small class="app-subtitle">Ultimate</small>
-            </div>
+        <div class="app-title">
+            <i class="fas fa-shield-halved"></i>
+            CryptoMsg
+            <small>Ultimate</small>
         </div>
-
-        <div class="header-right">
-            <!-- Language Toggle -->
-            <button id="langToggle" class="icon-btn" aria-label="تغییر زبان">
-                <i class="fas fa-globe"></i>
-            </button>
-
-            <!-- Theme Toggle -->
+        <div class="header-actions">
             <button id="themeToggle" class="icon-btn" aria-label="تغییر تم">
                 <i class="fas fa-moon"></i>
             </button>
-
-            <!-- Version Badge -->
-            <div id="versionBadge" class="version-badge" role="button" tabindex="0" aria-label="بروزرسانی کش">
-                <i class="fas fa-sync-alt"></i>
-                <span>نسخه 5.0</span>
-            </div>
+            <button id="langToggle" class="icon-btn" aria-label="تغییر زبان">
+                <i class="fas fa-language"></i>
+            </button>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="container" role="main">
+    <main class="container">
         <!-- Tabs -->
-        <nav class="tabs" role="tablist" aria-label="حالت عملیات">
-            <button id="tabEnc" class="tab-btn active enc" data-mode="encrypt" role="tab" aria-selected="true">
+        <nav class="tabs" role="tablist">
+            <button id="tabEnc" class="tab-btn active enc" role="tab" aria-selected="true">
                 <i class="fas fa-lock"></i>
                 <span>ارسال (رمزنگاری)</span>
             </button>
-            <button id="tabDec" class="tab-btn" data-mode="decrypt" role="tab" aria-selected="false">
+            <button id="tabDec" class="tab-btn" role="tab" aria-selected="false">
                 <i class="fas fa-unlock"></i>
                 <span>دریافت (رمزگشایی)</span>
             </button>
         </nav>
 
         <!-- Encryption Settings -->
-        <section id="encSettings" class="enc-settings" aria-label="تنظیمات رمزنگاری">
-            <!-- Method Selection -->
+        <section id="encSettings" aria-label="تنظیمات رمزنگاری">
             <div class="form-group">
                 <label for="encodingMode">
                     <i class="fas fa-layer-group"></i>
@@ -123,7 +95,7 @@
                 <span id="warningText"></span>
             </div>
 
-            <!-- Cover Text (for Steganography) -->
+            <!-- Cover Text Input (for invisible mode) -->
             <div id="coverTextInput" class="form-group" style="display:none;">
                 <label for="coverText">
                     <i class="fas fa-mask"></i>
@@ -139,7 +111,7 @@
                 <span class="checkbox-label">تقسیم هوشمند پیام‌های طولانی (پارت‌بندی)</span>
             </label>
 
-            <!-- Auto Clear Clipboard -->
+            <!-- Auto Clear Checkbox -->
             <label class="checkbox-wrapper" for="autoClearClipboard">
                 <input type="checkbox" id="autoClearClipboard">
                 <span class="checkbox-label">پاکسازی خودکار کلیپ‌بورد بعد از ۶۰ ثانیه</span>
@@ -147,307 +119,178 @@
         </section>
 
         <!-- Input Section -->
-        <section class="input-section">
-            <!-- Message Input -->
-            <div class="form-group">
-                <label id="inputLabel" for="inputText">
-                    <i class="fas fa-pen"></i>
-                    <span>متن پیام:</span>
+        <section class="form-group">
+            <label id="inputLabel" for="inputText">
+                <i class="fas fa-pen"></i>
+                <span>متن پیام:</span>
+            </label>
+            <textarea
+                id="inputText"
+                rows="4"
+                placeholder="پیام محرمانه خود را بنویسید..."
+                aria-label="متن پیام"
+            ></textarea>
+        </section>
+
+        <!-- Smart Suggestion -->
+        <div id="smartSuggestion" class="smart-suggestion" style="display:none;" role="status">
+            <i class="fas fa-robot"></i>
+            <span id="suggestionText"></span>
+        </div>
+
+        <!-- Password Section -->
+        <section class="form-group">
+            <div class="pass-header">
+                <label for="password">
+                    <i class="fas fa-key"></i>
+                    <span>رمز عبور (حیاتی):</span>
                 </label>
-                <textarea id="inputText" rows="3" placeholder="پیام محرمانه خود را بنویسید..."></textarea>
+                <button type="button" class="gen-pass-btn" aria-label="ساخت رمز جادویی">
+                    <i class="fas fa-magic"></i>
+                    <span>ساخت رمز جادویی</span>
+                </button>
             </div>
 
-            <!-- Smart Suggestion -->
-            <div id="smartSuggestion" class="smart-suggestion" style="display:none;" role="status" aria-live="polite">
-                <i class="fas fa-robot"></i>
-                <span id="suggestionText"></span>
+            <div class="password-wrapper">
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="حداقل ۱۲ کاراکتر..."
+                    aria-label="رمز عبور"
+                >
+                <button type="button" id="togglePassBtn" class="password-toggle" aria-label="نمایش/مخفی کردن رمز">
+                    <i class="fas fa-eye"></i>
+                </button>
             </div>
 
-            <!-- Password Section -->
-            <div class="form-group">
-                <div class="pass-header">
-                    <label for="password">
-                        <i class="fas fa-key"></i>
-                        <span>رمز عبور (حیاتی):</span>
-                    </label>
-                    <button id="genPassBtn" class="gen-pass-btn" type="button" aria-label="ساخت رمز تصادفی قوی">
-                        <i class="fas fa-magic"></i>
-                        <span>ساخت رمز جادویی</span>
-                    </button>
-                </div>
-
-                <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="حداقل ۱۲ کاراکتر..." autocomplete="off" aria-describedby="strengthInfo">
-                    <button id="togglePassBtn" class="password-toggle" type="button" aria-label="نمایش/مخفی کردن رمز">
-                        <i class="fas fa-eye" id="toggleBtn"></i>
-                    </button>
-                </div>
-
-                <!-- Strength Meter -->
-                <div class="strength-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                    <div id="strengthFill" class="strength-fill"></div>
-                </div>
-                <div id="strengthInfo" class="strength-info">
-                    <span id="strengthText" class="strength-text">قدرت: وارد نشده</span>
-                    <span id="crackTimeText" class="crack-time"></span>
-                </div>
+            <!-- Password Strength -->
+            <div class="strength-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                <div id="strengthFill" class="strength-fill"></div>
+            </div>
+            <div class="strength-info">
+                <span id="strengthText" class="strength-text">قدرت: وارد نشده</span>
+                <span id="crackTimeText" class="crack-time"></span>
             </div>
         </section>
 
         <!-- Action Button -->
-        <button id="actionBtn" class="btn-main btn-enc" aria-label="رمزنگاری پیام">
+        <button id="actionBtn" class="btn-main btn-enc" type="button">
             <i class="fas fa-lock"></i>
             <span>رمزنگاری پیام</span>
         </button>
 
         <!-- Result Area -->
-        <section id="resultArea" class="result-container" style="display:none;" aria-label="نتیجه عملیات">
+        <section id="resultArea" class="result-container" style="display:none;" aria-live="polite">
             <div class="stats-box">
-                <div>
-                    <i class="fas fa-text-width"></i>
-                    <span id="charCount">0</span>
-                    <span>کاراکتر</span>
-                </div>
-                <div>
-                    <i class="fas fa-envelope"></i>
-                    <span id="smsCount">0</span>
-                    <span>پیامک (تقریبی)</span>
-                </div>
+                <div><i class="fas fa-text-width"></i> <span id="charCount">0</span> کاراکتر</div>
+                <div><i class="fas fa-envelope"></i> <span id="smsCount">0</span> پیامک (تقریبی)</div>
             </div>
-            <div id="outputParts" aria-live="polite"></div>
+            <div id="outputParts"></div>
+        </section>
+
+        <!-- QR Code Section -->
+        <section id="qrSection" class="qr-container" style="display:none;">
+            <h3><i class="fas fa-qrcode"></i> <span>کد QR</span></h3>
+            <canvas id="qrCanvas"></canvas>
+            <div class="qr-actions">
+                <button id="qrDownload" class="btn-secondary">
+                    <i class="fas fa-download"></i> <span>دانلود QR</span>
+                </button>
+                <button id="qrCopy" class="btn-secondary">
+                    <i class="fas fa-copy"></i> <span>کپی تصویر</span>
+                </button>
+            </div>
         </section>
     </main>
 
-    <!-- Info Container (Accordion) -->
-    <aside class="info-container" aria-label="راهنما و اطلاعات">
+    <!-- Info/Guide Section -->
+    <aside class="info-container">
 
-        <!-- Quick Guide -->
-        <details class="info-section">
+        <details>
             <summary>
                 <i class="fas fa-book-open" style="color: var(--primary);"></i>
-                <span>راهنمای ساده (چطور کار کنم؟)</span>
+                راهنمای ساده (چطور کار کنم؟)
             </summary>
             <div class="info-content">
-                <h4 style="margin-top:0; color:var(--text);">📤 برای ارسال پیام:</h4>
-                <ol style="padding-right: 20px; margin-bottom: 15px;">
+                <h4>📤 برای ارسال پیام:</h4>
+                <ol>
                     <li><strong>نوشتن:</strong> پیام محرمانه خود را در کادر بنویسید.</li>
-                    <li><strong>رمزگذاری:</strong> یک رمز عبور قوی انتخاب کنید (این رمز را باید به گیرنده هم بگویید).</li>
+                    <li><strong>رمزگذاری:</strong> یک رمز عبور قوی انتخاب کنید.</li>
                     <li><strong>انتخاب ظاهر:</strong>
                         <ul>
-                            <li><small>🔹 <strong>استاندارد:</strong> برای کپی راحت در تلگرام/واتساپ.</small></li>
-                            <li><small>🔹 <strong>متن نامرئی:</strong> اگر می‌خواهید پیام در توییتر/اینستاگرام دیده نشود.</small></li>
+                            <li><small>🔹 <strong>استاندارد:</strong> برای کپی راحت.</small></li>
+                            <li><small>🔹 <strong>متن نامرئی:</strong> برای اینستاگرام/توییتر.</small></li>
                         </ul>
                     </li>
-                    <li><strong>ارسال:</strong> دکمه "تولید پیام" را بزنید، متن عجیب تولید شده را کپی کنید و بفرستید.</li>
+                    <li><strong>ارسال:</strong> دکمه "تولید پیام" را بزنید.</li>
                 </ol>
 
-                <h4 style="color:var(--text);">📥 برای خواندن پیام:</h4>
-                <ol style="padding-right: 20px;">
-                    <li>روی دکمه <strong>"دریافت (رمزگشایی)"</strong> در بالای صفحه کلیک کنید.</li>
-                    <li>متن رمز شده‌ای که دریافت کرده‌اید را در کادر وارد کنید.</li>
-                    <li>همان رمز عبوری که فرستنده گذاشته بود را بزنید تا پیام باز شود.</li>
+                <h4>📥 برای خواندن پیام:</h4>
+                <ol>
+                    <li>روی تب <strong>"دریافت"</strong> کلیک کنید.</li>
+                    <li>متن رمز شده را در کادر وارد کنید.</li>
+                    <li>رمز عبور را بزنید.</li>
                 </ol>
-
-                <div class="keyboard-shortcuts">
-                    <h4>⌨️ میانبرهای صفحه کلید:</h4>
-                    <ul>
-                        <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> = اجرای عملیات</li>
-                        <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>T</kbd> = تغییر تم</li>
-                        <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> = تغییر زبان</li>
-                    </ul>
-                </div>
             </div>
         </details>
 
-        <!-- Security Tips -->
-        <details class="info-section">
+        <details>
             <summary>
                 <i class="fas fa-shield-alt" style="color: var(--danger);"></i>
-                <span>نکات مهم امنیتی (حتما بخوانید)</span>
+                نکات مهم امنیتی
             </summary>
             <div class="info-content">
-                <ul style="list-style-type: none; padding: 0;">
-                    <li class="security-tip">
-                        <span class="tip-icon">🚫</span>
-                        <div class="tip-content">
-                            <strong>رمز را جداگانه بفرستید:</strong>
-                            <p class="tip-desc">هرگز رمز عبور را در همان پیامی که متن رمز شده را می‌فرستید، قرار ندهید. (مثلاً متن را در واتساپ بفرستید و رمز را تلفنی بگویید).</p>
-                        </div>
-                    </li>
-                    <li class="security-tip">
-                        <span class="tip-icon">⌨️</span>
-                        <div class="tip-content">
-                            <strong>مراقب کیبوردها باشید:</strong>
-                            <p class="tip-desc">کیبوردهای گوشی کلمات شما را یاد می‌گیرند. برای امنیت ۱۰۰٪، از کیبوردهای امن یا حالت Incognito مرورگر استفاده کنید.</p>
-                        </div>
-                    </li>
-                    <li class="security-tip">
-                        <span class="tip-icon">📋</span>
-                        <div class="tip-content">
-                            <strong>حافظه کپی را پاک کنید:</strong>
-                            <p class="tip-desc">بعد از اینکه پیام را کپی و ارسال کردید، یک متن الکی دیگر کپی کنید تا پیام اصلی از حافظه گوشی (Clipboard) پاک شود.</p>
-                        </div>
-                    </li>
-                    <li class="security-tip">
-                        <span class="tip-icon">⚠️</span>
-                        <div class="tip-content">
-                            <strong>فراموشی رمز = نابودی پیام:</strong>
-                            <p class="tip-desc">چون ما هیچ سروری نداریم، اگر رمز عبور را فراموش کنید، هیچ راهی برای بازگرداندن پیام وجود ندارد.</p>
-                        </div>
-                    </li>
+                <ul>
+                    <li>🚫 <strong>رمز را جداگانه بفرستید:</strong> هرگز در همان پیام نفرستید.</li>
+                    <li>⌨️ <strong>مراقب کیبوردها باشید:</strong> از کیبوردهای امن استفاده کنید.</li>
+                    <li>📋 <strong>حافظه کپی را پاک کنید:</strong> بعد از ارسال، یک متن دیگر کپی کنید.</li>
+                    <li>⚠️ <strong>فراموشی رمز = نابودی پیام:</strong> هیچ راهی برای بازگشت نیست.</li>
                 </ul>
             </div>
         </details>
 
-        <!-- Method Selection Guide -->
-        <details class="info-section">
-            <summary>
-                <i class="fas fa-layer-group" style="color: var(--warning);"></i>
-                <span>راهنمای انتخاب روش‌ها</span>
-            </summary>
-            <div class="info-content">
-                <div class="method-grid">
-                    <div class="method-card method-sms">
-                        <h5>📱 SMS</h5>
-                        <p>حروف تصادفی فارسی</p>
-                        <small>بهترین گزینه چون اپراتورها حساس نیستند.</small>
-                    </div>
-                    <div class="method-card method-social">
-                        <h5>📸 اینستاگرام/توییتر</h5>
-                        <p>متن نامرئی</p>
-                        <small>پیام کاملاً ناپدید می‌شود (داخل یک متن عادی).</small>
-                    </div>
-                    <div class="method-card method-normal">
-                        <h5>💬 واتساپ/تلگرام</h5>
-                        <p>جملات فارسی</p>
-                        <small>طبیعی برای ربات‌های فیلترینگ.</small>
-                    </div>
-                    <div class="method-card method-ai">
-                        <h5>🤖 هوش مصنوعی</h5>
-                        <p>حروف روسی/چینی</p>
-                        <small>گیج‌کننده برای AIهای نظارتی.</small>
-                    </div>
-                </div>
-            </div>
-        </details>
-
-        <!-- Technical Specs -->
-        <details class="info-section">
+        <details>
             <summary>
                 <i class="fas fa-code" style="color: var(--success);"></i>
-                <span>مشخصات فنی (نسخه 5.0)</span>
+                مشخصات فنی (نسخه 5.0)
             </summary>
             <div class="info-content">
-                <div class="tech-specs">
-                    <div class="spec-item">
-                        <i class="fas fa-lock"></i>
-                        <div>
-                            <strong>الگوریتم:</strong>
-                            <span>AES-GCM (256-bit) - رمزنگاری با تایید اصالت</span>
-                        </div>
-                    </div>
-                    <div class="spec-item">
-                        <i class="fas fa-key"></i>
-                        <div>
-                            <strong>کلیدسازی:</strong>
-                            <span>PBKDF2 با 600,000 تکرار و Salt تصادفی</span>
-                        </div>
-                    </div>
-                    <div class="spec-item">
-                        <i class="fas fa-server"></i>
-                        <div>
-                            <strong>سرور:</strong>
-                            <span>ندارد! تمام عملیات در دستگاه شما</span>
-                        </div>
-                    </div>
-                    <div class="spec-item">
-                        <i class="fas fa-cloud"></i>
-                        <div>
-                            <strong>ذخیره‌سازی:</strong>
-                            <span>Zero-Knowledge - هیچ داده‌ای ارسال نمی‌شود</span>
-                        </div>
-                    </div>
-                    <div class="spec-item">
-                        <i class="fas fa-code-branch"></i>
-                        <div>
-                            <strong>کد منبع:</strong>
-                            <span>کاملاً باز و قابل بررسی</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="security-badges">
-                    <span class="badge badge-success">✅ AES-GCM</span>
-                    <span class="badge badge-success">✅ PBKDF2</span>
-                    <span class="badge badge-success">✅ Web Crypto API</span>
-                    <span class="badge badge-info">📱 PWA Ready</span>
-                    <span class="badge badge-info">🌐 Offline</span>
-                </div>
+                <table class="specs-table">
+                    <tr><td>الگوریتم</td><td>AES-GCM (256-bit)</td></tr>
+                    <tr><td>کلیدسازی</td><td>PBKDF2 (600,000 تکرار)</td></tr>
+                    <tr><td>Salt</td><td>128-bit تصادفی</td></tr>
+                    <tr><td>IV</td><td>96-bit تصادفی</td></tr>
+                    <tr><td>پنهان‌نگاری</td><td>Zero-Width Characters</td></tr>
+                </table>
             </div>
         </details>
 
-        <!-- Terms & Disclaimer -->
-        <details class="info-section">
+        <details>
             <summary>
                 <i class="fas fa-scale-balanced" style="color: var(--text-muted);"></i>
-                <span>شرایط استفاده و سلب مسئولیت</span>
+                شرایط استفاده
             </summary>
             <div class="info-content">
-                <p style="margin-top: 0;">این نرم‌افزار یک پروژه <strong>متن‌باز (Open Source)</strong> است که با هدف ارتقای حریم خصوصی توسعه یافته است.</p>
-                <ul style="list-style-type: none; padding: 0;">
-                    <li class="disclaimer-item">
-                        <span class="disclaimer-icon">📵</span>
-                        <div>
-                            <strong>هیچ سروری وجود ندارد:</strong>
-                            <p>تمام عملیات رمزنگاری در دستگاه شما انجام می‌شود. ما هیچ دسترسی‌ای به پیام‌ها، رمزها یا اطلاعات شما نداریم.</p>
-                        </div>
-                    </li>
-                    <li class="disclaimer-item">
-                        <span class="disclaimer-icon">🔥</span>
-                        <div>
-                            <strong>غیرقابل بازگشت:</strong>
-                            <p>اگر رمز عبور خود را فراموش کنید، پیام شما برای همیشه از دست رفته است. هیچ راهی (تکرار می‌کنیم: هیچ راهی) برای بازیابی وجود ندارد.</p>
-                        </div>
-                    </li>
-                    <li class="disclaimer-item">
-                        <span class="disclaimer-icon">⚖️</span>
-                        <div>
-                            <strong>مسئولیت کاربر:</strong>
-                            <p>مسئولیت حفظ رمز عبور و همچنین محتوای پیام‌های تبادل شده، تماماً بر عهده کاربر است.</p>
-                        </div>
-                    </li>
+                <p>این نرم‌افزار <strong>متن‌باز (Open Source)</strong> است.</p>
+                <ul>
+                    <li>📵 <strong>هیچ سروری وجود ندارد.</strong></li>
+                    <li>🔥 <strong>غیرقابل بازگشت:</strong> رمز را فراموش نکنید.</li>
+                    <li>⚖️ <strong>مسئولیت:</strong> استفاده صحیح بر عهده کاربر است.</li>
                 </ul>
             </div>
         </details>
-
-        <!-- Footer Info -->
-        <footer class="footer-info">
-            <div class="footer-links">
-                <a href="https://github.com/443a/CryptoMsg" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                    <i class="fab fa-github"></i>
-                    <span>GitHub</span>
-                </a>
-                <a href="https://github.com/443a/CryptoMsg/issues" target="_blank" rel="noopener noreferrer" aria-label="گزارش مشکل">
-                    <i class="fas fa-bug"></i>
-                    <span>گزارش مشکل</span>
-                </a>
-            </div>
-            <p class="copyright">
-                ساخته شده با ❤️ توسط
-                <a href="https://github.com/443a" target="_blank" rel="noopener noreferrer">443a</a>
-            </p>
-            <p class="license">
-                منتشر شده تحت لیسانس
-                <a href="LICENSE" target="_blank">MIT</a>
-            </p>
-        </footer>
     </aside>
 
-    <!-- Scripts -->
-    <script src="assets/js/app.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="version-badge" id="versionBadge" role="contentinfo">
+            <i class="fas fa-sync-alt"></i>
+            <span>نسخه 5.0</span>
+        </div>
+        <p>ساخته شده با ❤️ توسط <a href="https://github.com/443a" target="_blank" rel="noopener">443a</a></p>
+    </footer>
 
-    <!-- CSP Note: frame-ancestors must be set via HTTP header on server -->
-    <!-- Example nginx config: add_header Content-Security-Policy "frame-ancestors 'none';"; -->
-    <!-- Example apache config: Header set Content-Security-Policy "frame-ancestors 'none';" -->
+    <!-- Scripts -->
+    <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

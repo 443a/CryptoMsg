@@ -184,10 +184,7 @@ export class CryptoModule {
     let password = '';
     for (let i = 0; i < length; i++) {
       const charIndex = randomValues[i] % charsetArray.length;
-      const char = charsetArray[charIndex];
-      if (char !== undefined) {
-        password += char;
-      }
+      password += charsetArray[charIndex] ?? '';
     }
     return password;
   }

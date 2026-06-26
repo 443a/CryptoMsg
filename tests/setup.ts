@@ -1,79 +1,94 @@
 /**
- * @fileoverview Test Setup for CryptoMsg
+ * @fileoverview CryptoMsg - Test Setup
  * @version 5.0.0
  */
 
-import '@testing-library/jest-dom';
-
 // Mock Web Crypto API
-const mockCrypto = {
+class MockCrypto {
+  getRandomValues<T extends ArrayBufferView | null>(array: T): T {
+    const bytes = new Uint8Array(array.byteLength);
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = Math.floor(Math.random() * 256);
+    }
+    return new Uint8Array(array.buffer, 0, array.byteLength) as T;
+  }
+}
+
+// @ts-expect-error - Mock window.crypto
+globalThis.crypto = {
   subtle: {
-    importKey: jest.fn(),
-    deriveKey: jest.fn(),
-    encrypt: jest.fn(),
-    decrypt: jest.fn(),
-  },
-  getRandomValues: jest.fn((arr: Uint8Array) => {
-    for (let i = 0; i < arr.length; i++) {
-      arr[i] = i;
-    }
-    return arr;
-  }),
-};
-
-Object.defineProperty(global, 'crypto', {
-  value: mockCrypto,
-  writable: true,
-});
-
-// Mock TextEncoder/Decoder
-Object.defineProperty(global, 'TextEncoder', {
-  value: class TextEncoder {
-    encode(str: string): Uint8Array {
-      const arr = new Uint8Array(str.length);
-      for (let i = 0; i < str.length; i++) {
-        arr[i] = str.charCodeAt(i);
+    importKey: async () => ({}),
+    deriveKey: async () => ({}),
+    encrypt: async (opts: object, key: object, data: BufferSource) => {
+      return data;
+    },
+    decrypt: async (opts: object, key: object, data: BufferSource) => {
+      return data;
+    },
+    getRandomValues: (array: ArrayBufferView | null) => {
+      const bytes = new Uint8Array(array!.byteLength);
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = Math.floor(Math.random() * 256);
       }
-      return arr;
-    }
+      return bytes;
+    },
   },
-});
-
-Object.defineProperty(global, 'TextDecoder', {
-  value: class TextDecoder {
-    decode(arr: Uint8Array): string {
-      return String.fromCharCode(...arr);
+  getRandomValues: (array: ArrayBufferView | null) => {
+    const bytes = new Uint8Array(array!.byteLength);
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = Math.floor(Math.random() * 256);
     }
+    return bytes;
   },
-});
+};
 
 // Mock localStorage
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
-};
-Object.defineProperty(global, 'localStorage', {
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+})();
+
+Object.defineProperty(globalThis, 'localStorage', {
   value: localStorageMock,
 });
 
-// Mock clipboard
+// Mock clipboard API
 Object.defineProperty(navigator, 'clipboard', {
   value: {
-    writeText: jest.fn().mockResolvedValue(undefined),
-    readText: jest.fn().mockResolvedValue(''),
+    writeText: async () => {},
+    readText: async () => '',
   },
-  writable: true,
+  configurable: true,
 });
 
-// Mock window.isSecureContext
-Object.defineProperty(window, 'isSecureContext', {
-  value: true,
+// Mock service worker
+Object.defineProperty(navigator, 'serviceWorker', {
+  value: {
+    register: async () => ({}),
+    getRegistrations: async () => [],
+  },
+  configurable: true,
 });
 
-// Reset mocks before each test
-beforeEach(() => {
-  jest.clearAllMocks();
-  localStorageMock.getItem.mockReturnValue(null);
-});
+// Suppress console errors in tests
+const originalError = console.error;
+console.error = (...args: unknown[]) => {
+  if (
+    typeof args[0] === 'string' &&
+    args[0].includes('React')
+  ) {
+    return;
+  }
+  originalError.apply(console, args);
+};

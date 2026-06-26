@@ -2,334 +2,210 @@
 
 <div align="center">
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-5.0-green.svg)
-![Security](https://img.shields.io/badge/Security-AES--GCM--256--red.svg)
-![PWA](https://img.shields.io/badge/PWA-Ready-orange.svg)
-![Accessibility](https://img.shields.io/badge/Accessibility-WCAG--2.1--green.svg)
+![Version](https://img.shields.io/badge/version-5.0.0-6366f1?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-AES--GCM%20256--bit-ef4444?style=for-the-badge)
+![PWA](https://img.shields.io/badge/PWA-Ready-10b981?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178c6?style=for-the-badge)
 
-**[🌐 اجرای آنلاین (Cloudflare Pages)](https://cryptomsg.pages.dev/)**
-&ensp;|&ensp;
-**[🌐 اجرای آنلاین (GitHub Pages)](https://443a.github.io/CryptoMsg/)**
+**ابزار فوق امن رمزنگاری متن و پنهان‌نگاری با Web Crypto API**
+
+🌐 **[نسخه آنلاین (Cloudflare Pages)](https://cryptomsg.pages.dev/)** | 📖 **[مستندات](#-راهنمای-استفاده)**
 
 </div>
 
 ---
 
-## 📖 فهرست مطالب
+## ✨ ویژگی‌های کلیدی
 
-- [درباره پروژه](#درباره-پروژه)
-- [ویژگی‌ها](#ویژگی‌ها)
-- [امنیت](#امنیت)
-- [نحوه استفاده](#نحوه-استفاده)
-- [نصب و توسعه](#نصب-و-توسعه)
-- [معماری](#معماری)
-- [مشارکت](#مشارکت)
-- [لایسنس](#لایسنس)
+### 🔒 امنیت سطح بالا
 
----
-
-## 🎯 درباره پروژه
-
-**CryptoMsg Ultimate** یک ابزار متن‌باز و رایگان برای رمزنگاری پیام‌های متنی با بالاترین سطح امنیت است. این ابزار از **Web Crypto API** داخلی مرورگر استفاده می‌کند و تمام عملیات به صورت کاملاً **کلاینت‌ساید** و **بدون سرور** انجام می‌شود.
-
-### ✨ چرا CryptoMsg؟
-
-| ویژگی | توضیح |
-|--------|-------|
-| 🔒 **امنیت فوق‌العاده** | AES-GCM 256-bit با PBKDF2 |
-| 🌐 **کاملاً آفلاین** | بدون نیاز به اینترنت |
-| 📱 **PWA** | قابل نصب روی موبایل و دسکتاپ |
-| 👻 **Zero-Knowledge** | هیچ داده‌ای ارسال نمی‌شود |
-| 🎨 **چند زبانه** | فارسی و انگلیسی |
-| 🌓 **تم تاریک/روشن** | دو حالت نمایش |
-| ♿ **دسترس‌پذیر** | پشتیبانی از ARIA و صفحه‌کلید |
-
----
-
-## ✨ ویژگی‌ها
-
-### 🔐 رمزنگاری
-
-- **AES-GCM 256-bit**: رمزنگاری با تایید اصالت (Authenticated Encryption)
-- **PBKDF2**: کلیدسازی با 600,000 تکرار برای جلوگیری از Brute-force
-- **Salt تصادفی**: هر پیام با کلید متفاوت رمز می‌شود
-- **IV تصادفی**: بردار مقداردهی اولیه یکتا برای هر پیام
-
-### 🎭 پنهان‌نگاری (Steganography)
-
-| روش | توضیح | مناسب برای |
-|-----|-------|-----------|
-| **Base64** | استاندارد | واتساپ، ذخیره‌سازی |
-| **حروف فارسی** | تبدیل به حروف فارسی | SMS، پیامک |
-| **جملات فارسی** | کلمات معنی‌دار | فیلترینگ |
-| **متن نامرئی** | داخل متن عادی | اینستاگرام، توییتر |
-| **حروف روسی** | الفبای سیریلیک | AIهای نظارتی |
-| **ایموجی** | فقط شکلک | فان |
-| **چینی** | کاراکترهای چینی | فیلترهای کلمات |
-| **انگلیسی جعلی** | شبیه Seed Phrase | استتار |
-
-### 🛡️ امنیت
-
-- **Content Security Policy**: حفاظت از XSS
-- **Subresource Integrity**: بررسی完整性 CDNها
-- **Sanitize ورودی**: جلوگیری از XSS
-- **پاکسازی خودکار کلیپ‌بورد**: امنیت بیشتر
-- **کیبوردهای امن**: توصیه استفاده از Incognito
-
-### 📱 PWA
-
-- قابل نصب روی Android, iOS, Windows, macOS, Linux
-- کار آفلاین بدون نیاز به اینترنت
-- Push Notifications (آماده)
-- Dark/Light Theme
-
----
-
-## 🔒 امنیت
-
-### استانداردهای استفاده شده
-
-| پارامتر | مقدار | توضیح |
-|---------|-------|-------|
-| **الگوریتم** | AES-GCM | Authenticated Encryption |
-| **اندازه کلید** | 256-bit | استاندارد NIST |
-| **Key Derivation** | PBKDF2 | Password-Based Key Derivation |
-| **Hash Function** | SHA-256 | NIST Standard |
-| **Iterations** | 600,000 | مقاومت در برابر Brute-force |
-| **Salt** | 128-bit | تصادفی از CSPRNG |
-| **IV** | 96-bit | تصادفی از CSPRNG |
-
-### نحوه کار
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    فرآیند رمزنگاری                          │
-├─────────────────────────────────────────────────────────────┤
-│  1. کاربر پیام و رمز عبور را وارد می‌کند                   │
-│  2. Salt تصادفی (16 بایت) تولید می‌شود                     │
-│  3. IV تصادفی (12 بایت) تولید می‌شود                        │
-│  4. رمز عبور با PBKDF2 (600K تکرار) به کلید تبدیل می‌شود  │
-│  5. پیام با AES-GCM رمز می‌شود                              │
-│  6. خروجی: Salt + IV + Ciphertext (همه Base64)             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### ⚠️ هشدارهای امنیتی
-
-1. **رمز عبور را جداگانه بفرستید**: هرگز رمز و پیام را در یک پیام ارسال نکنید
-2. **از رمز قوی استفاده کنید**: حداقل ۱۲ کاراکتر با حروف بزرگ، کوچک، اعداد و نمادها
-3. **حافظه کلیپ‌بورد را پاک کنید**: بعد از کپی، یک متن الکی کپی کنید
-4. **در حالت Incognito استفاده کنید**: برای امنیت بیشتر
-
----
-
-## 📖 نحوه استفاده
-
-### ۱. ارسال پیام امن
-
-```markdown
-1. وارد سایت شوید
-2. پیام خود را بنویسید
-3. یک رمز عبور قوی انتخاب کنید
-4. روش مخفی‌سازی را انتخاب کنید:
-   - SMS → حروف فارسی
-   - اینستاگرام → متن نامرئی
-   - واتساپ → جملات فارسی
-5. دکمه "رمزنگاری" را بزنید
-6. متن تولید شده را کپی و ارسال کنید
-```
-
-### ۲. دریافت پیام
-
-```markdown
-1. به تب "دریافت" بروید
-2. متن رمز شده را پیست کنید
-3. رمز عبور را وارد کنید
-4. پیام اصلی نمایش داده می‌شود
-```
-
-### ⌨️ میانبرهای صفحه‌کلید
-
-| میانبر | عملکرد |
+| ویژگی | مشخصات |
 |--------|--------|
-| `Ctrl + Enter` | اجرای عملیات |
-| `Ctrl + Shift + T` | تغییر تم |
-| `Ctrl + Shift + L` | تغییر زبان |
+| **الگوریتم** | AES-GCM (256-bit) با Authentication |
+| **Key Derivation** | PBKDF2 با 600,000 تکرار |
+| **Salt** | 128-bit تصادفی (CSPRNG) |
+| **IV** | 96-bit تصادفی |
+| **Client-Side** | تمام عملیات در دستگاه شما |
+
+### 🎭 روش‌های مخفی‌سازی (Encoding)
+
+| روش | توضیح | کاربرد |
+|-----|--------|--------|
+| **Base64** | استاندارد جهانی | واتساپ، ذخیره فایل |
+| **فارسی** | حروف تصادفی فارسی | SMS، پیامک |
+| **جملات فارسی** | کلمات معنی‌دار | فیلترینگ |
+| **نامرئی** | Zero-Width Characters | اینستاگرام، توییتر |
+| **روسی** | الفبای سیریلیک | عبور از فیلتر |
+| **ایموجی** | تبدیل به شکلک | فان، گیج کردن AI |
+| **چینی** | کاراکترهای چینی | فشرده‌ترین حالت |
+| **انگلیسی جعلی** | Seed Phrase استایل | استتار |
+
+### ⚡ امکانات
+
+- 📱 **PWA** - قابل نصب روی گوشی
+- 🌙 **تم تاریک/روشن** - با ذخیره در localStorage
+- 🌐 **چندزبانگی** - فارسی و انگلیسی
+- 📋 **کلیپ‌بورد هوشمند** - کپی با نوتیفیکیشن
+- 🔄 **بروزرسانی خودکار** - Service Worker
+- ⌨️ **میانبرهای کیبورد** - Ctrl+Enter, Ctrl+Shift+T
 
 ---
 
-## 🛠️ نصب و توسعه
+## 🚀 شروع سریع
 
-### پیش‌نیازها
-
-- هیچ! این پروژه هیچ وابستگی (Dependency) ندارد
-
-### نصب سریع
+### استفاده آنلاین
 
 ```bash
-# کلون کردن پروژه
-git clone https://github.com/443a/CryptoMsg.git
+# Cloudflare Pages
+https://cryptomsg.pages.dev/
 
-# رفتن به پوشه پروژه
+# GitHub Pages
+https://443a.github.io/CryptoMsg/
+```
+
+### نصب محلی
+
+```bash
+# کلون پروژه
+git clone https://github.com/443a/CryptoMsg.git
 cd CryptoMsg
 
-# باز کردن در مرورگر
-# در ویندوز:
-start index.html
+# نصب وابستگی‌ها
+npm install
 
-# در لینوکس:
-xdg-open index.html
+# اجرا در حالت توسعه
+npm run dev
 
-# در مک:
-open index.html
+# بیلد برای پروداکشن
+npm run build
 ```
 
-### توسعه با Server محلی
+---
 
-```bash
-# با Python 3
-python -m http.server 8080
+## 📖 راهنمای استفاده
 
-# با Node.js
-npx serve .
+### ارسال پیام امن
 
-# با PHP
-php -S localhost:8080
-```
+1. **نوشتن پیام** در کادر متن
+2. **انتخاب رمز عبور** قوی (حداقل 12 کاراکتر)
+3. **انتخاب روش مخفی‌سازی**:
+   - SMS → `حروف فارسی`
+   - شبکه اجتماعی → `نامرئی`
+   - واتساپ → `استاندارد`
+4. کلیک روی **"رمزنگاری پیام"**
+5. کپی نتیجه و ارسال به گیرنده
 
-### ساختار پروژه
+### دریافت پیام
+
+1. رفتن به تب **"دریافت"**
+2. **پیست** متن رمز شده
+3. وارد کردن **رمز عبور**
+4. کلیک روی **"رمزگشایی"**
+
+### نکات امنیتی
+
+⚠️ **رمز عبور را جداگانه بفرستید!** (متن را در تلگرام، رمز را تلفنی)
+
+---
+
+## 🏗️ معماری پروژه
 
 ```
 CryptoMsg/
-├── index.html              # صفحه اصلی
-├── manifest.json           # تنظیمات PWA
-├── sw.js                   # Service Worker
-├── assets/
-│   ├── js/
-│   │   └── app.js         # کد اصلی جاوااسکریپت
-│   ├── css/
-│   │   └── style.css      # استایل‌ها
-│   └── icons/
-│       ├── icon.svg
-│       ├── icon-192.png
-│       └── icon-512.png
-├── docs/                   # مستندات (در حال توسعه)
-│   ├── README.md
-│   ├── CONTRIBUTING.md
-│   ├── SECURITY.md
-│   └── CHANGELOG.md
+├── src/
+│   ├── core/           # Core modules
+│   │   ├── crypto.ts   # رمزنگاری AES-GCM
+│   │   ├── encoding.ts # تبدیل و پنهان‌نگاری
+│   │   └── state.ts   # مدیریت state
+│   ├── services/       # سرویس‌ها
+│   │   └── index.ts    # Clipboard, Storage, QR
+│   ├── ui/             # رابط کاربری
+│   │   └── index.ts    # UIModule
+│   ├── i18n/           # بین‌المللی‌سازی
+│   │   └── index.ts    # ترجمه‌ها
+│   ├── workers/        # Web Workers
+│   │   └── crypto.worker.ts
+│   └── types/          # TypeScript types
+│       └── index.ts
+├── tests/              # تست‌ها
+│   ├── crypto.test.ts
+│   ├── encoding.test.ts
+│   └── e2e.spec.ts
 ├── .github/
-│   └── workflows/
-│       └── ci.yml          # CI/CD Pipeline
-├── LICENSE                 # MIT License
-├── README.md               # این فایل
-└── REVIEW.md               # گزارش بازبینی
+│   └── workflows/      # CI/CD
+│       └── ci.yml
+├── index.html
+├── manifest.json       # PWA manifest
+└── package.json
 ```
 
 ---
 
-## 🏗️ معماری
+## 🧪 تست
 
-### نمودار ماژول‌ها
+```bash
+# تست‌های یونیت
+npm test
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      CryptoMsg Architecture                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    │
-│  │    State    │    │   Crypto    │    │  Encoding   │    │
-│  │  Manager    │◄──►│   Module    │◄──►│   Module    │    │
-│  └─────────────┘    └─────────────┘    └─────────────┘    │
-│         │                  │                  │            │
-│         └──────────────────┼──────────────────┘            │
-│                            │                                │
-│                    ┌───────▼───────┐                       │
-│                    │      UI       │                       │
-│                    │    Module     │                       │
-│                    └───────────────┘                       │
-│                            │                                │
-│         ┌──────────────────┼──────────────────┐             │
-│         ▼                  ▼                  ▼             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
-│  │    PWA      │    │  Clipboard   │    │    i18n     │  │
-│  │  Service    │    │   Manager    │    │   Support    │  │
-│  └─────────────┘    └─────────────┘    └─────────────┘  │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+# تست با UI
+npm run test:ui
+
+# پوشش تست
+npm run test:coverage
+
+# تست‌های E2E
+npm run test:e2e
 ```
 
-### کلاس‌های اصلی
+---
 
-| کلاس | توضیح |
-|------|-------|
-| `StateManager` | مدیریت وضعیت اپلیکیشن |
-| `CryptoModule` | عملیات رمزنگاری/رمزگشایی |
-| `EncodingModule` | تبدیل فرمت‌ها و تشخیص خودکار |
-| `UIModule` | مدیریت رابط کاربری |
+## 🔧 تنظیمات توسعه
+
+### متغیرهای محیطی
+
+```env
+# .env.local
+VITE_APP_VERSION=5.0.0
+VITE_APP_TITLE=CryptoMsg
+```
+
+### میانبرهای کیبورد
+
+| میانبر | عملکرد |
+|--------|--------|
+| `Ctrl+Enter` | اجرای رمزنگاری/رمزگشایی |
+| `Ctrl+Shift+T` | تغییر تم |
+| `Ctrl+Shift+L` | تغییر زبان |
 
 ---
 
 ## 🤝 مشارکت
 
-ما از مشارکت شما استقبال می‌کنیم! لطفاً قبل از شروع، [راهنمای مشارکت](CONTRIBUTING.md) را مطالعه کنید.
-
-### راه‌های مشارکت
-
-- 🐛 گزارش باگ
-- 💡 پیشنهاد ویژگی جدید
-- 📝 بهبود مستندات
-- 🔧 کدنویسی
-- 🌐 ترجمه به زبان‌های دیگر
-- 📖 نوشتن تست
+1. Fork کنید
+2. Branch جدید بسازید (`git checkout -b feature/amazing`)
+3. تغییرات را commit کنید (`git commit -m 'Add amazing feature'`)
+4. Push کنید (`git push origin feature/amazing`)
+5. Pull Request باز کنید
 
 ---
 
 ## 📄 لایسنس
 
-این پروژه تحت لیسنس **MIT** منتشر شده است.
-
-```
-MIT License
-
-Copyright (c) 2024 443a (CryptoMsg)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
 ## 🙏 قدردانی
 
-- **Web Crypto API**: برای موتور رمزنگاری قدرتمند
-- **Font Awesome**: آیکون‌های زیبا
-- **Vazirmatn**: فونت فارسی
-- **Cloudflare Pages**: هاست رایگان
-- **GitHub**: میزبانی کد
+- [Vazirmatn](https://github.com/rastikerdar/vazirmatn) - فونت فارسی
+- [Font Awesome](https://fontawesome.com) - آیکون‌ها
+- [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) - رمزنگاری
 
 ---
 
 <div align="center">
 
-ساخته شده با ❤️ برای امنیت و حریم خصوصی
-
-**[⬆ بازگشت به بالا](#-cryptomsg-ultimate)**
+**ساخته شده با ❤️ برای حریم خصوصی شما**
 
 </div>
