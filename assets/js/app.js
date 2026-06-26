@@ -1421,12 +1421,104 @@ function toggleLanguage() {
 }
 
 // ==========================================
-// 9. INITIALIZATION
+// 9. EVENT LISTENERS (CSP-Friendly)
+// ==========================================
+
+/**
+ * Initialize all event listeners
+ * Using addEventListener instead of inline handlers for CSP compliance
+ */
+function initEventListeners() {
+    // Tab buttons
+    const tabEnc = document.getElementById('tabEnc');
+    const tabDec = document.getElementById('tabDec');
+
+    if (tabEnc) {
+        tabEnc.addEventListener('click', () => setMode('encrypt'));
+    }
+    if (tabDec) {
+        tabDec.addEventListener('click', () => setMode('decrypt'));
+    }
+
+    // Encoding mode selector
+    const encodingMode = document.getElementById('encodingMode');
+    if (encodingMode) {
+        encodingMode.addEventListener('change', updateMethodInfo);
+    }
+
+    // Input text
+    const inputText = document.getElementById('inputText');
+    if (inputText) {
+        inputText.addEventListener('input', analyzeInput);
+    }
+
+    // Password field
+    const password = document.getElementById('password');
+    if (password) {
+        password.addEventListener('input', checkStrength);
+    }
+
+    // Toggle password visibility
+    const togglePassBtn = document.getElementById('togglePassBtn');
+    if (togglePassBtn) {
+        togglePassBtn.addEventListener('click', togglePass);
+    }
+
+    // Generate password button
+    const genPassBtn = document.getElementById('genPassBtn');
+    if (genPassBtn) {
+        genPassBtn.addEventListener('click', generatePassword);
+    }
+
+    // Action button
+    const actionBtn = document.getElementById('actionBtn');
+    if (actionBtn) {
+        actionBtn.addEventListener('click', processAction);
+    }
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    // Language toggle
+    const langToggle = document.getElementById('langToggle');
+    if (langToggle) {
+        langToggle.addEventListener('click', toggleLanguage);
+    }
+
+    // Version badge (update app)
+    const versionBadge = document.getElementById('versionBadge');
+    if (versionBadge) {
+        versionBadge.addEventListener('click', updateApp);
+        versionBadge.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                updateApp();
+            }
+        });
+    }
+
+    // Auto-clear clipboard checkbox
+    const autoClearClipboard = document.getElementById('autoClearClipboard');
+    if (autoClearClipboard) {
+        autoClearClipboard.addEventListener('change', (e) => {
+            AppState.state.autoClearEnabled = e.target.checked;
+        });
+    }
+}
+
+// ==========================================
+// 10. INITIALIZATION
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize UI elements
     UI.initElements();
+
+    // Initialize event listeners (CSP-friendly)
+    initEventListeners();
 
     // Apply saved theme
     UI.applyTheme(AppState.state.currentTheme);
@@ -1441,13 +1533,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(err => {
-                console.log('SW registration failed:', err);
+                // Silent fail - SW registration is not critical
+                console.debug('SW registration failed:', err);
             });
         });
     }
 
     // Handle install prompt
-    let deferredPrompt;
+    let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -1460,7 +1553,7 @@ document.addEventListener('DOMContentLoaded', function() {
         UI.elements.installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                const { outcome } = await deferredPrompt.userChoice();
                 deferredPrompt = null;
                 UI.elements.installBtn.style.display = 'none';
             }
@@ -1485,6 +1578,8 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleLanguage();
         }
     });
+
+    console.debug('CryptoMsg v5.0 initialized');
 });
 
 // ==========================================
