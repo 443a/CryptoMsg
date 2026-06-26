@@ -1,0 +1,93 @@
+name: 💡 Feature Request
+description: پیشنهاد ویژگی جدید برای CryptoMsg
+title: "[Feature] "
+labels: ["enhancement"]
+assignees: ["443a"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 💡 درخواست ویژگی
+
+        ممنون از پیشنهاد شما! لطفاً موارد زیر را پر کنید.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: شرح ویژگی
+      description: ویژگی مورد نظر را به صورت واضح توضیح دهید
+      placeholder: "توضیح ویژگی مورد نظر..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: مشکل یا نیاز
+      description: این ویژگی چه مشکلی را حل می‌کند؟
+      placeholder: "چه مشکلی را حل می‌کند؟"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: راه‌حل پیشنهادی
+      description: راه‌حل شما برای پیاده‌سازی چیست؟
+      placeholder: "راه‌حل پیشنهادی..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: جایگزین‌ها
+      description: آیا راه‌حل‌های دیگری در نظر دارید؟
+      placeholder: "راه‌حل‌های جایگزین..."
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: موارد استفاده
+      description: این ویژگی چه کاربردهایی دارد؟
+      placeholder: |
+        - مورد استفاده ۱
+        - مورد استفاده ۲
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: اولویت
+      description: اولویت این ویژگی چقدر است؟
+      options:
+        - 🔴 بالا - باید اضافه شود
+        - 🟡 متوسط - خوب است اضافه شود
+        - 🟢 پایین - اگر وقت شد اضافه شود
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: چک‌لیست
+      options:
+        - label: "این ویژگی با امنیت پروژه سازگار است"
+          required: true
+        - label: "این ویژگی در محدوده پروژه است"
+          required: true
+        - label: "می‌توانم در پیاده‌سازی کمک کنم"
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ## نکات مهم
+        - ویژگی‌های پیشنهادی بر اساس اولویت و امکان‌پذیری پیاده‌سازی می‌شوند
+        - ویژگی‌های امنیتی در اولویت هستند
+        - پیشنهادات غیرمرتبط بررسی نمی‌شوند

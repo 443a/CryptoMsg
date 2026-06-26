@@ -1,0 +1,116 @@
+name: 🐛 Bug Report
+description: گزارش باگ در CryptoMsg
+title: "[Bug] "
+labels: ["bug"]
+assignees: ["443a"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🐛 گزارش باگ
+
+        ممنون از گزارش باگ! لطفاً موارد زیر را پر کنید.
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: نسخه
+      description: کدام نسخه پروژه را استفاده می‌کنید؟
+      options:
+        - 5.0.0 (آخرین)
+        - 4.7.x
+        - 4.6.x
+        - نسخه قدیمی‌تر
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: مرورگر
+      description: از چه مرورگری استفاده می‌کنید؟
+      options:
+        - Chrome (آخرین)
+        - Firefox (آخرین)
+        - Edge (آخرین)
+        - Safari
+        - Opera
+        - موبایل (Android)
+        - موبایل (iOS)
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: سیستم‌عامل
+      description: سیستم‌عامل دستگاه شما
+      placeholder: "مثال: Windows 11, macOS 14, Android 13"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: شرح مشکل
+      description: مشکل را به صورت واضح توضیح دهید
+      placeholder: "توضیح دقیق مشکل را اینجا بنویسید..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: مراحل بازتولید
+      description: مراحلی که باگ در آن‌ها رخ می‌دهد
+      placeholder: |
+        1. به صفحه اصلی بروم
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: رفتار مورد انتظار
+      description: چه چیزی باید اتفاق بیفتد؟
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: رفتار واقعی
+      description: چه چیزی واقعاً اتفاق می‌افتد؟
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console Errors
+      description: خطاهای کنسول مرورگر (در صورت وجود)
+      placeholder: |
+        خطاهای Console را اینجا کپی کنید
+        (F12 > Console)
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: اسکرین‌شات
+      description: تصاویر از مشکل (در صورت امکان)
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ## نکات مهم
+        - قبل از گزارش، مطمئن شوید مشکل قبلاً گزارش نشده
+        - در صورت امکان، PoC (Proof of Concept) ارائه دهید
+        - سریعاً پاسخ نمی‌دهیم، اما همه گزارش‌ها بررسی می‌شوند
