@@ -42,46 +42,15 @@ Object.defineProperty(navigator, 'serviceWorker', {
   configurable: true,
 });
 
-// Mock Web Crypto API
-const mockCrypto = {
-  getRandomValues<T extends Uint8Array>(array: T): T {
-    const bytes = new Uint8Array(array.byteLength);
-    for (let i = 0; i < bytes.length; i++) {
-      bytes[i] = Math.floor(Math.random() * 256);
-    }
-    return new Uint8Array(array.buffer, 0, array.byteLength) as T;
-  },
-  subtle: {
-    importKey: async () => ({}),
-    deriveKey: async () => ({}),
-    encrypt: async (_opts: unknown, _key: unknown, data: BufferSource) => data,
-    decrypt: async (_opts: unknown, _key: unknown, data: BufferSource) => data,
-    getRandomValues<T extends Uint8Array>(array: T): T {
-      const bytes = new Uint8Array(array.byteLength);
-      for (let i = 0; i < bytes.length; i++) {
-        bytes[i] = Math.floor(Math.random() * 256);
-      }
-      return new Uint8Array(array.buffer, 0, array.byteLength) as T;
-    },
-  },
-};
-
-// Use Object.defineProperty to override crypto
+// Use Node's real Web Crypto implementation in unit tests.
 Object.defineProperty(globalThis, 'crypto', {
-  value: mockCrypto,
+  value: crypto,
   writable: true,
   configurable: true,
 });
 
-// Mock crypto.getRandomValues for Uint32Array
-Object.defineProperty(globalThis.crypto, 'getRandomValues', {
-  value<T extends Uint32Array>(array: T): T {
-    const values = new Uint32Array(array.byteLength / 4);
-    for (let i = 0; i < values.length; i++) {
-      values[i] = Math.floor(Math.random() * 4294967296);
-    }
-    return new Uint32Array(array.buffer, 0, array.byteLength / 4) as T;
-  },
+Object.defineProperty(window, 'crypto', {
+  value: crypto,
   writable: true,
   configurable: true,
 });

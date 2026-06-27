@@ -71,7 +71,7 @@ export class EncodingModule {
    * Check if text contains invisible (zero-width) characters
    */
   hasInvisibleChars(text: string): boolean {
-    return text.split('').some((char) => ZW_CHARS.includes(char));
+    return Array.from(text).some((char) => ZW_CHARS.includes(char));
   }
 
   /**
@@ -121,7 +121,7 @@ export class EncodingModule {
    */
   invisibleToText(str: string): string {
     let invisiblePart = '';
-    for (const char of str.split('')) {
+    for (const char of Array.from(str)) {
       if (ZW_CHARS.includes(char)) {
         invisiblePart += char;
       }
@@ -133,7 +133,7 @@ export class EncodingModule {
 
     // Convert zero-width to binary
     let binary = '';
-    for (const char of invisiblePart.split('')) {
+    for (const char of Array.from(invisiblePart)) {
       const index = ZW_CHARS.indexOf(char);
       binary += index.toString(2).padStart(2, '0');
     }
@@ -141,7 +141,10 @@ export class EncodingModule {
     // Convert binary to Base64
     let base64 = '';
     for (let i = 0; i < binary.length; i += 8) {
-      base64 += String.fromCharCode(parseInt(binary.substring(i, i + 8), 2));
+      const byte = binary.substring(i, i + 8);
+      if (byte.length === 8) {
+        base64 += String.fromCharCode(parseInt(byte, 2));
+      }
     }
 
     return base64;
@@ -164,7 +167,7 @@ export class EncodingModule {
     const isWordBased = modeName === 'farsiWords' || modeName === 'englishFake';
     const result: string[] = [];
 
-    for (const char of base64.split('')) {
+    for (const char of Array.from(base64)) {
       if (char === '=') continue;
       const idx = DICTIONARIES.base64.indexOf(char);
       if (idx !== -1 && targetDict[idx]) {
@@ -200,11 +203,11 @@ export class EncodingModule {
 
     let tokens: string[];
     if (isWordBased) {
-      tokens = text.trim().split(/\s+/);
+      tokens = text.trim() ? text.trim().split(/\s+/) : [];
     } else if (modeName === 'emoji') {
-      tokens = text.replace(/\s+/g, '').split('');
+      tokens = Array.from(text.replace(/\s+/g, ''));
     } else {
-      tokens = text.replace(/\s+/g, '').split('');
+      tokens = Array.from(text.replace(/\s+/g, ''));
     }
 
     let result = '';
@@ -229,7 +232,7 @@ export class EncodingModule {
   detectMode(text: string): EncodingMethod {
     const trimmed = text.trim();
     const firstToken = trimmed.split(/\s+/)[0] ?? '';
-    const firstChar = trimmed.split('')[0] ?? '';
+    const firstChar = Array.from(trimmed)[0] ?? '';
 
     // Word-based detection
     if (DICTIONARIES.farsiWords.includes(firstToken)) return 'farsiWords';
@@ -252,13 +255,19 @@ export class EncodingModule {
     let count = 0;
     let limit = 5;
 
-    for (const char of str.split('')) {
+    const randomBytes = new Uint8Array(str.length);
+    window.crypto.getRandomValues(randomBytes);
+    let randomIndex = 0;
+
+    for (const char of Array.from(str)) {
       result += char;
       count++;
       if (count >= limit) {
         result += ' ';
         count = 0;
-        limit = Math.floor(Math.random() * 5) + 3;
+        const randomByte = randomBytes[randomIndex] ?? 0;
+        randomIndex++;
+        limit = (randomByte % 5) + 3;
       }
     }
 

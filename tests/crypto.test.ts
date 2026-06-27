@@ -28,14 +28,33 @@ describe('CryptoModule', () => {
     });
 
     it('should produce different ciphertexts for same input when crypto works properly', async () => {
-      // This test verifies the encrypt function works
-      // In real implementation, different salt/IV would produce different outputs
       const plaintext = 'Secret message';
       const password = 'my-password';
 
       const encrypted1 = await Crypto.encrypt(plaintext, password);
-      expect(encrypted1).toBeTruthy();
-      expect(encrypted1.length).toBeGreaterThan(0);
+      const encrypted2 = await Crypto.encrypt(plaintext, password);
+      expect(encrypted1).not.toBe(encrypted2);
+    });
+
+    it('should reject wrong passwords', async () => {
+      const encrypted = await Crypto.encrypt('Secret message', 'correct-password');
+
+      await expect(Crypto.decrypt(encrypted, 'wrong-password')).rejects.toMatchObject({
+        code: 'DECRYPT_FAIL',
+      });
+    });
+
+    it('should reject tampered ciphertext', async () => {
+      const encrypted = await Crypto.encrypt('Secret message', 'correct-password');
+      const decoded = JSON.parse(atob(encrypted)) as { s: string; i: string; c: string };
+      const ciphertext = atob(decoded.c);
+      const tamperedByte = String.fromCharCode(ciphertext.charCodeAt(0) ^ 1);
+      decoded.c = btoa(tamperedByte + ciphertext.slice(1));
+      const tampered = btoa(JSON.stringify(decoded));
+
+      await expect(Crypto.decrypt(tampered, 'correct-password')).rejects.toMatchObject({
+        code: 'DECRYPT_FAIL',
+      });
     });
 
     it('should handle empty string', async () => {

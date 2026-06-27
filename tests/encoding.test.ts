@@ -68,6 +68,9 @@ describe('EncodingModule', () => {
       const encoded = Encoding.mapToDictionary(base64, 'emoji');
       expect(encoded).toBeTruthy();
       expect(encoded.length).toBeGreaterThan(0);
+
+      const decoded = Encoding.mapFromDictionary(encoded, 'emoji');
+      expect(decoded).toBe(base64);
     });
 
     it('should handle farsiWords mode', () => {

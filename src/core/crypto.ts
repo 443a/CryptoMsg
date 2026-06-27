@@ -5,6 +5,7 @@
  */
 
 import type { CryptoConfig, EncryptedData, PasswordStrength } from '../types';
+import { base64ToBytes, bytesToBase64, toArrayBuffer } from './binary';
 
 // ==========================================
 // CONFIGURATION
@@ -55,7 +56,7 @@ export class CryptoModule {
     return window.crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt: salt as unknown as BufferSource,
+        salt: toArrayBuffer(salt),
         iterations: CRYPTO_CONFIG.iterations,
         hash: CRYPTO_CONFIG.hash,
       },
@@ -64,7 +65,7 @@ export class CryptoModule {
         name: CRYPTO_CONFIG.algorithm,
         length: CRYPTO_CONFIG.keyLength,
       },
-      true,
+      false,
       ['encrypt', 'decrypt']
     );
   }
@@ -73,23 +74,14 @@ export class CryptoModule {
    * Convert ArrayBuffer to Base64 string
    */
   private arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
-    const bytes = new Uint8Array(buffer);
-    const binary = Array.from(bytes)
-      .map(b => String.fromCharCode(b))
-      .join('');
-    return window.btoa(binary);
+    return bytesToBase64(buffer);
   }
 
   /**
    * Convert Base64 string to ArrayBuffer
    */
   private base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binaryString = window.atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes.buffer as ArrayBuffer;
+    return toArrayBuffer(base64ToBytes(base64));
   }
 
   /**
@@ -108,7 +100,7 @@ export class CryptoModule {
       const key = await this.deriveKey(keyMaterial, salt);
 
       const encryptedContent = await window.crypto.subtle.encrypt(
-        { name: CRYPTO_CONFIG.algorithm, iv },
+        { name: CRYPTO_CONFIG.algorithm, iv: toArrayBuffer(iv) },
         key,
         this.encoder.encode(text)
       );
@@ -152,7 +144,7 @@ export class CryptoModule {
       const key = await this.deriveKey(keyMaterial, new Uint8Array(salt));
 
       const decryptedContent = await window.crypto.subtle.decrypt(
-        { name: CRYPTO_CONFIG.algorithm, iv: new Uint8Array(iv) },
+        { name: CRYPTO_CONFIG.algorithm, iv },
         key,
         ciphertext
       );
@@ -174,21 +166,30 @@ export class CryptoModule {
    * Generate cryptographically secure random password
    */
   generatePassword(length: number = 24): string {
+    if (!Number.isInteger(length) || length < 1 || length > 1024) {
+      throw new CryptoError('Password length must be between 1 and 1024', 'INVALID_PASSWORD_LENGTH');
+    }
+
     const charset =
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=';
     const charsetArray = Array.from(charset);
-    const randomValues = new Uint32Array(length);
-    window.crypto.getRandomValues(randomValues);
+    const maxUnbiasedValue =
+      Math.floor(0x100000000 / charsetArray.length) * charsetArray.length;
 
     let password = '';
-    for (let i = 0; i < length; i++) {
-      // noUncheckedIndexedAccess requires explicit check
-      const randomValue = randomValues[i];
-      if (randomValue === undefined) continue;
-      const charIndex = randomValue % charsetArray.length;
-      // charIndex is always valid since it's modulo charsetArray.length
-      password += charsetArray[charIndex]!;
+    while (password.length < length) {
+      const randomValues = new Uint32Array(length - password.length);
+      window.crypto.getRandomValues(randomValues);
+
+      for (const randomValue of randomValues) {
+        if (randomValue >= maxUnbiasedValue) continue;
+
+        const charIndex = randomValue % charsetArray.length;
+        password += charsetArray[charIndex]!;
+        if (password.length === length) break;
+      }
     }
+
     return password;
   }
 
@@ -271,7 +272,7 @@ export class CryptoModule {
       const key = await this.deriveKey(keyMaterial, salt);
 
       const encryptedContent = await window.crypto.subtle.encrypt(
-        { name: CRYPTO_CONFIG.algorithm, iv },
+        { name: CRYPTO_CONFIG.algorithm, iv: toArrayBuffer(iv) },
         key,
         arrayBuffer
       );
@@ -309,6 +310,10 @@ export class CryptoModule {
       const data = new Uint8Array(arrayBuffer);
 
       // Check magic bytes
+      if (data.byteLength < 33) {
+        throw new CryptoError('Invalid file format', 'INVALID_FORMAT');
+      }
+
       const magic = String.fromCharCode(...data.slice(0, 4));
       if (magic !== 'CMEG') {
         throw new CryptoError('Invalid file format', 'INVALID_FORMAT');
@@ -327,7 +332,7 @@ export class CryptoModule {
       const key = await this.deriveKey(keyMaterial, salt);
 
       const decryptedContent = await window.crypto.subtle.decrypt(
-        { name: CRYPTO_CONFIG.algorithm, iv },
+        { name: CRYPTO_CONFIG.algorithm, iv: toArrayBuffer(iv) },
         key,
         ciphertext
       );
