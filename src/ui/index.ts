@@ -20,6 +20,16 @@ import { CryptoWorker } from '../services/cryptoWorker';
 export class UIModule {
   // DOM Elements cache
   private elements: Map<string, HTMLElement | null> = new Map();
+  private readonly encodingOptions: Array<{ value: EncodingMethod; labelKey: string }> = [
+    { value: 'base64', labelKey: 'methodBase64' },
+    { value: 'farsiChars', labelKey: 'methodFarsiChars' },
+    { value: 'farsiWords', labelKey: 'methodFarsiWords' },
+    { value: 'invisible', labelKey: 'methodInvisible' },
+    { value: 'russian', labelKey: 'methodRussian' },
+    { value: 'emoji', labelKey: 'methodEmoji' },
+    { value: 'chinese', labelKey: 'methodChinese' },
+    { value: 'englishFake', labelKey: 'methodEnglishFake' },
+  ];
 
   // ==========================================
   // INITIALIZATION
@@ -29,7 +39,10 @@ export class UIModule {
     this.cacheElements();
     this.initEventListeners();
     this.applyTheme(AppState.theme);
+    i18n.setLanguage(AppState.language);
     this.updateUIText();
+    this.updateTabStyles();
+    this.updateFormVisibility();
     this.initMethodInfo();
     this.initPWA();
     this.initKeyboardShortcuts();
@@ -46,7 +59,8 @@ export class UIModule {
       'themeToggle', 'langToggle', 'versionBadge', 'installBtn',
       'fileVaultFile', 'fileVaultPassword', 'fileVaultEncryptBtn',
       'fileVaultDecryptBtn', 'fileVaultText', 'fileVaultOutput',
-      'fileVaultCopyBtn', 'fileVaultStatus', 'fileVaultFileMeta'
+      'fileVaultCopyBtn', 'fileVaultStatus', 'fileVaultFileMeta',
+      'fileVaultChooseBtn',
     ];
 
     ids.forEach((id) => {
@@ -55,7 +69,13 @@ export class UIModule {
   }
 
   private getElement(id: string): HTMLElement | null {
-    return this.elements.get(id) ?? null;
+    if (this.elements.has(id)) {
+      return this.elements.get(id) ?? null;
+    }
+
+    const element = document.getElementById(id);
+    this.elements.set(id, element);
+    return element;
   }
 
   private initEventListeners(): void {
@@ -211,7 +231,7 @@ export class UIModule {
         suggestionText.append(
           `${i18n.t('smartShort')} `,
           this.createSuggestionTag(i18n.t('methodFarsiChars')),
-          ` ${AppState.language === 'fa' ? 'یا' : 'or'} `,
+          ` ${i18n.t('smartOr')} `,
           this.createSuggestionTag(i18n.t('methodEnglishFake')),
           '.'
         );
@@ -546,6 +566,7 @@ export class UIModule {
 
   private updateFileVaultMeta(): void {
     const meta = this.getElement('fileVaultFileMeta');
+    const chooseLabel = this.getElement('fileVaultChooseBtn')?.querySelector('span');
     const file = this.getSelectedVaultFile();
 
     if (!meta) {
@@ -554,9 +575,11 @@ export class UIModule {
 
     if (!file) {
       meta.textContent = i18n.t('fileVaultNoFile');
+      if (chooseLabel) chooseLabel.textContent = i18n.t('fileVaultChooseFile');
       return;
     }
 
+    if (chooseLabel) chooseLabel.textContent = i18n.t('fileVaultChangeFile');
     meta.textContent = `${file.name} - ${this.formatBytes(file.size)}`;
     if (file.size > MAX_FILE_SIZE_BYTES) {
       this.setFileVaultStatus(i18n.t('errorFileVaultTooBig'), 'error');
@@ -692,46 +715,102 @@ export class UIModule {
     const newLanguage = AppState.toggleLanguage();
     i18n.setLanguage(newLanguage);
     this.updateUIText();
-    this.setMode(AppState.mode);
     this.updateMethodInfo();
+    this.checkPasswordStrength();
+    this.analyzeInput();
     this.applyTheme(AppState.theme);
   }
 
   updateUIText(): void {
     const t = i18n.t.bind(i18n);
+    const lang = AppState.language;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+    document.title = lang === 'fa' ? 'کریپتو مسنجر | CryptoMsg Ultimate' : 'CryptoMsg Ultimate';
 
-    // Update tab labels
+    this.setText('#installBtn span', t('btnInstallShort'));
+    this.getElement('installBtn')?.setAttribute('aria-label', t('btnInstall'));
+    this.getElement('themeToggle')?.setAttribute('aria-label', t('ariaThemeToggle'));
+    this.getElement('langToggle')?.setAttribute('aria-label', t('ariaLangToggle'));
+    this.getElement('togglePassBtn')?.setAttribute('aria-label', t('ariaPasswordToggle'));
+    this.getElement('resultArea')?.setAttribute('aria-label', t('ariaResult'));
+
     const tabEncLabel = this.getElement('tabEnc')?.querySelector('span');
     const tabDecLabel = this.getElement('tabDec')?.querySelector('span');
     if (tabEncLabel) tabEncLabel.textContent = t('tabEncrypt');
-    if (tabDecLabel) tabDecLabel.textContent = t('tabDec');
+    if (tabDecLabel) tabDecLabel.textContent = t('tabDecrypt');
+    this.getElement('tabEnc')?.setAttribute('aria-selected', String(AppState.mode === 'encrypt'));
+    this.getElement('tabDec')?.setAttribute('aria-selected', String(AppState.mode === 'decrypt'));
 
-    // Update version badge
     const versionBadge = this.getElement('versionBadge')?.querySelector('span');
     if (versionBadge) versionBadge.textContent = t('version');
 
-    // Update input placeholders
-    const inputText = this.getElement('inputText') as HTMLInputElement;
+    this.setText('label[for="encodingMode"] span', t('encodingMethod'));
+    this.updateEncodingOptions();
+
+    const inputText = this.getElement('inputText') as HTMLTextAreaElement;
     const passwordInput = this.getElement('password') as HTMLInputElement;
     const coverText = this.getElement('coverText') as HTMLInputElement;
     const fileVaultPassword = this.getElement('fileVaultPassword') as HTMLInputElement;
     const fileVaultText = this.getElement('fileVaultText') as HTMLTextAreaElement;
+    const fileVaultOutput = this.getElement('fileVaultOutput') as HTMLTextAreaElement;
 
+    this.setText('#inputLabel span', t('inputLabel'));
+    this.setText('label[for="password"] span', t('passwordLabel'));
+    this.setText('label[for="coverText"] span', t('coverTextLabel'));
+    this.setText('#coverTextInput .hint-text', t('coverTextHint'));
+    this.setText('.gen-pass-btn span', t('btnGeneratePass'));
+    document.querySelector('.gen-pass-btn')?.setAttribute('aria-label', t('btnGeneratePass'));
     if (inputText) inputText.placeholder = t('inputPlaceholder');
     if (passwordInput) passwordInput.placeholder = t('passwordPlaceholder');
     if (coverText) coverText.placeholder = t('coverTextPlaceholder');
-    if (fileVaultPassword) fileVaultPassword.placeholder = t('passwordPlaceholder');
+    if (fileVaultPassword) fileVaultPassword.placeholder = t('fileVaultPasswordPlaceholder');
     if (fileVaultText) fileVaultText.placeholder = t('fileVaultTextPlaceholder');
+    if (fileVaultOutput) fileVaultOutput.placeholder = '';
+    inputText?.setAttribute('aria-label', t('inputLabel'));
+    passwordInput?.setAttribute('aria-label', t('passwordLabel'));
 
-    // Update checkboxes
     const splitLabel = this.getElement('splitOutput')?.nextElementSibling;
     const autoClearLabel = this.getElement('autoClearClipboard')?.nextElementSibling;
     if (splitLabel) splitLabel.textContent = t('checkboxSplit');
     if (autoClearLabel) autoClearLabel.textContent = t('checkboxAutoClear');
 
-    // Update button
+    this.setText('#charCountLabel', t('chars'));
+    this.setText('#smsCountLabel', t('smsApprox'));
+    this.setText('#qrSection h3 span', t('qrTitle'));
+    this.setText('#qrDownload span', t('qrDownload'));
+    this.setText('#qrCopy span', t('qrCopy'));
+
     this.updateButton();
     this.updateFileVaultText();
+    this.updateInfoSections();
+    this.updateFooterText();
+    this.updateMethodInfo();
+    this.checkPasswordStrength();
+  }
+
+  private setText(selector: string, text: string): void {
+    const element = document.querySelector(selector);
+    if (element) element.textContent = text;
+  }
+
+  private updateEncodingOptions(): void {
+    const select = this.getElement('encodingMode') as HTMLSelectElement | null;
+    if (!select) return;
+
+    const currentValue = select.value;
+    select.replaceChildren();
+
+    for (const optionConfig of this.encodingOptions) {
+      const option = document.createElement('option');
+      option.value = optionConfig.value;
+      option.textContent = i18n.t(optionConfig.labelKey);
+      select.appendChild(option);
+    }
+
+    select.value = this.encodingOptions.some(option => option.value === currentValue)
+      ? currentValue
+      : 'base64';
   }
 
   private updateFileVaultText(): void {
@@ -752,7 +831,7 @@ export class UIModule {
     const subtitle = panel?.querySelector('.file-vault-header p');
     if (subtitle) subtitle.textContent = i18n.t('fileVaultSubtitle');
 
-    const fileLabel = document.querySelector('label[for="fileVaultFile"] span');
+    const fileLabel = document.querySelector('#fileVaultPickLabel span');
     const passwordLabel = document.querySelector('label[for="fileVaultPassword"] span');
     const textLabel = document.querySelector('label[for="fileVaultText"] span');
     const outputLabel = document.querySelector('label[for="fileVaultOutput"] span');
@@ -763,6 +842,162 @@ export class UIModule {
     if (outputLabel) outputLabel.textContent = i18n.t('fileVaultOutputLabel');
 
     this.updateFileVaultMeta();
+  }
+
+  private updateInfoSections(): void {
+    const details = Array.from(document.querySelectorAll<HTMLElement>('.info-container details'));
+    const configs: Array<{ iconClass: string; color: string; titleKey: string; content: HTMLElement }> = [
+      {
+        iconClass: 'fas fa-book-open',
+        color: 'var(--primary)',
+        titleKey: 'guideTitle',
+        content: this.createGuideContent(),
+      },
+      {
+        iconClass: 'fas fa-shield-alt',
+        color: 'var(--danger)',
+        titleKey: 'securityTitle',
+        content: this.createListContent([
+          'securitySeparate',
+          'securityKeyboard',
+          'securityClipboard',
+          'securityForgot',
+        ]),
+      },
+      {
+        iconClass: 'fas fa-code',
+        color: 'var(--success)',
+        titleKey: 'technicalTitle',
+        content: this.createTechnicalContent(),
+      },
+      {
+        iconClass: 'fas fa-scale-balanced',
+        color: 'var(--text-muted)',
+        titleKey: 'termsTitle',
+        content: this.createListContent([
+          'termsOpenSource',
+          'termsNoServer',
+          'termsIrreversible',
+          'termsResponsibility',
+        ]),
+      },
+    ];
+
+    configs.forEach((config, index) => {
+      const detail = details[index];
+      if (!detail) return;
+
+      const summary = detail.querySelector('summary');
+      if (summary) {
+        const icon = document.createElement('i');
+        icon.className = config.iconClass;
+        icon.style.color = config.color;
+
+        const text = document.createElement('span');
+        text.textContent = i18n.t(config.titleKey);
+
+        summary.replaceChildren(icon, text);
+      }
+
+      const content = detail.querySelector('.info-content');
+      if (content) {
+        content.replaceChildren(...Array.from(config.content.childNodes));
+      }
+    });
+  }
+
+  private createGuideContent(): HTMLElement {
+    const wrapper = document.createElement('div');
+
+    wrapper.append(
+      this.createHeading(i18n.t('guideSendTitle')),
+      this.createOrderedList([
+        'guideSendWrite',
+        'guideSendPassword',
+        'guideSendAppearance',
+        'guideStandard',
+        'guideInvisible',
+        'guideSendAction',
+      ]),
+      this.createHeading(i18n.t('guideReceiveTitle')),
+      this.createOrderedList([
+        'guideReceiveTab',
+        'guideReceivePaste',
+        'guideReceivePassword',
+      ])
+    );
+
+    return wrapper;
+  }
+
+  private createListContent(keys: string[]): HTMLElement {
+    const wrapper = document.createElement('div');
+    wrapper.appendChild(this.createUnorderedList(keys));
+    return wrapper;
+  }
+
+  private createTechnicalContent(): HTMLElement {
+    const wrapper = document.createElement('div');
+    const table = document.createElement('table');
+    table.className = 'specs-table';
+
+    const rows: Array<[string, string]> = [
+      [i18n.t('techAlgorithm'), 'AES-GCM (256-bit)'],
+      [i18n.t('techKdf'), `PBKDF2 (${i18n.t('techIterations')})`],
+      ['Salt', `128-bit ${i18n.t('techRandom')}`],
+      ['IV', `96-bit ${i18n.t('techRandom')}`],
+      [i18n.t('techSteganography'), 'Zero-Width Characters'],
+    ];
+
+    for (const [name, value] of rows) {
+      const row = document.createElement('tr');
+      const nameCell = document.createElement('td');
+      const valueCell = document.createElement('td');
+      nameCell.textContent = name;
+      valueCell.textContent = value;
+      row.append(nameCell, valueCell);
+      table.appendChild(row);
+    }
+
+    wrapper.appendChild(table);
+    return wrapper;
+  }
+
+  private createHeading(text: string): HTMLHeadingElement {
+    const heading = document.createElement('h4');
+    heading.textContent = text;
+    return heading;
+  }
+
+  private createOrderedList(keys: string[]): HTMLOListElement {
+    const list = document.createElement('ol');
+    keys.forEach(key => list.appendChild(this.createListItem(i18n.t(key))));
+    return list;
+  }
+
+  private createUnorderedList(keys: string[]): HTMLUListElement {
+    const list = document.createElement('ul');
+    keys.forEach(key => list.appendChild(this.createListItem(i18n.t(key))));
+    return list;
+  }
+
+  private createListItem(text: string): HTMLLIElement {
+    const item = document.createElement('li');
+    item.textContent = text;
+    return item;
+  }
+
+  private updateFooterText(): void {
+    const footer = document.querySelector('.footer p');
+    if (!footer) return;
+
+    const link = document.createElement('a');
+    link.href = 'https://github.com/443a';
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = '443a';
+
+    footer.replaceChildren(`${i18n.t('footerBuiltBy')} `, link);
   }
 
   // ==========================================

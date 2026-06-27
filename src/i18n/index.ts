@@ -27,8 +27,10 @@ const translations: Translations = {
     inputPlaceholder: 'پیام محرمانه خود را بنویسید...',
     passwordLabel: 'رمز عبور (حیاتی):',
     passwordPlaceholder: 'حداقل ۱۲ کاراکتر...',
+    fileVaultPasswordPlaceholder: 'یک رمز قوی و منحصربه‌فرد وارد کنید',
     coverTextLabel: 'متن پوششی (برای مخفی‌سازی):',
     coverTextPlaceholder: 'مثلاً: سلام چطوری؟ خوبی؟',
+    coverTextHint: 'پیام اصلی شما لابلای این متن مخفی می‌شود.',
 
     // Buttons
     btnEncrypt: 'رمزنگاری پیام',
@@ -38,6 +40,7 @@ const translations: Translations = {
     btnCopied: 'کپی شد!',
     btnGeneratePass: 'ساخت رمز جادویی',
     btnInstall: 'نصب اپلیکیشن',
+    btnInstallShort: 'نصب',
     btnUpdate: 'بروزرسانی کش',
 
     // Password Strength
@@ -52,6 +55,7 @@ const translations: Translations = {
     smartLong: 'متن طولانی است. برای جلوگیری از مسدودی در پیامک، حتماً از پارت‌بندی استفاده کنید.',
     smartSocial: 'برای ارسال در شبکه‌های اجتماعی،',
     smartAmazing: 'شگفت‌انگیز است!',
+    smartOr: 'یا',
 
     // Errors
     errorEmptyFields: '⚠️ لطفاً متن و رمز عبور را وارد کنید',
@@ -65,6 +69,7 @@ const translations: Translations = {
     // Stats
     chars: 'کاراکتر',
     smsApprox: 'پیامک (تقریبی)',
+    partLabel: 'بخش',
 
     // Sections
     guideTitle: 'راهنمای ساده (چطور کار کنم؟)',
@@ -72,6 +77,31 @@ const translations: Translations = {
     methodsTitle: 'راهنمای انتخاب روش‌ها',
     technicalTitle: 'مشخصات فنی',
     termsTitle: 'شرایط استفاده و سلب مسئولیت',
+    guideSendTitle: 'برای ارسال پیام:',
+    guideSendWrite: 'نوشتن: پیام محرمانه خود را در کادر بنویسید.',
+    guideSendPassword: 'رمزگذاری: یک رمز عبور قوی انتخاب کنید.',
+    guideSendAppearance: 'انتخاب ظاهر: روش نمایش خروجی را انتخاب کنید.',
+    guideStandard: 'استاندارد: برای کپی و نگهداری ساده.',
+    guideInvisible: 'متن نامرئی: برای مخفی‌سازی داخل متن پوششی.',
+    guideSendAction: 'ارسال: دکمه رمزنگاری پیام را بزنید.',
+    guideReceiveTitle: 'برای خواندن پیام:',
+    guideReceiveTab: 'روی تب دریافت کلیک کنید.',
+    guideReceivePaste: 'متن رمز شده را در کادر پیام وارد کنید.',
+    guideReceivePassword: 'رمز عبور را وارد کنید و رمزگشایی را بزنید.',
+    securitySeparate: 'رمز را جداگانه بفرستید: هرگز رمز را در همان پیام نفرستید.',
+    securityKeyboard: 'مراقب کیبوردها باشید: از کیبوردها و دستگاه‌های قابل اعتماد استفاده کنید.',
+    securityClipboard: 'حافظه کپی را پاک کنید: بعد از ارسال، یک متن دیگر کپی کنید.',
+    securityForgot: 'فراموشی رمز یعنی از دست رفتن پیام: راه بازیابی رمز وجود ندارد.',
+    termsOpenSource: 'این نرم‌افزار متن‌باز است و همه عملیات رمزنگاری داخل مرورگر انجام می‌شود.',
+    termsNoServer: 'هیچ سروری وجود ندارد و داده‌ها برای رمزنگاری ارسال نمی‌شوند.',
+    termsIrreversible: 'رمز فراموش‌شده قابل بازیابی نیست.',
+    termsResponsibility: 'مسئولیت استفاده صحیح بر عهده کاربر است.',
+    techAlgorithm: 'الگوریتم',
+    techKdf: 'کلیدسازی',
+    techIterations: '۶۰۰٬۰۰۰ تکرار',
+    techRandom: 'تصادفی',
+    techSteganography: 'پنهان‌نگاری',
+    footerBuiltBy: 'ساخته شده توسط',
 
     // Encoding Methods
     methodBase64: 'استاندارد (Base64)',
@@ -123,6 +153,8 @@ const translations: Translations = {
     fileVaultTitle: 'صندوق فایل به متن',
     fileVaultSubtitle: 'فایل‌های کوچک را به متن رمز شده قابل کپی تبدیل کنید و بعدا با همان رمز فایل اصلی را بازسازی کنید.',
     fileVaultPickLabel: 'فایل کوچک (حداکثر ۵ مگابایت):',
+    fileVaultChooseFile: 'انتخاب فایل',
+    fileVaultChangeFile: 'انتخاب فایل دیگر',
     fileVaultPasswordLabel: 'رمز فایل:',
     fileVaultTextLabel: 'متن رمز شده فایل:',
     fileVaultOutputLabel: 'خروجی قابل کپی:',
@@ -159,6 +191,7 @@ const translations: Translations = {
     // Accessibility
     ariaThemeToggle: 'تغییر تم',
     ariaLangToggle: 'تغییر زبان',
+    ariaPasswordToggle: 'نمایش یا مخفی کردن رمز',
     ariaProcessing: 'در حال پردازش',
     ariaResult: 'نتیجه عملیات',
   },
@@ -179,8 +212,10 @@ const translations: Translations = {
     inputPlaceholder: 'Write your confidential message...',
     passwordLabel: 'Password (Critical):',
     passwordPlaceholder: 'At least 12 characters...',
+    fileVaultPasswordPlaceholder: 'Use a strong unique password',
     coverTextLabel: 'Cover Text (for Steganography):',
     coverTextPlaceholder: 'e.g.: Hello, how are you?',
+    coverTextHint: 'Your real message is hidden inside this cover text.',
 
     // Buttons
     btnEncrypt: 'Encrypt Message',
@@ -190,6 +225,7 @@ const translations: Translations = {
     btnCopied: 'Copied!',
     btnGeneratePass: 'Generate Strong Password',
     btnInstall: 'Install App',
+    btnInstallShort: 'Install',
     btnUpdate: 'Update Cache',
 
     // Password Strength
@@ -204,6 +240,7 @@ const translations: Translations = {
     smartLong: 'Long text. Use partitioning to avoid SMS blocking.',
     smartSocial: 'For social media,',
     smartAmazing: 'is amazing!',
+    smartOr: 'or',
 
     // Errors
     errorEmptyFields: '⚠️ Please enter both text and password',
@@ -217,6 +254,7 @@ const translations: Translations = {
     // Stats
     chars: 'Characters',
     smsApprox: 'SMS (approx)',
+    partLabel: 'Part',
 
     // Sections
     guideTitle: 'Quick Guide (How to use?)',
@@ -224,6 +262,31 @@ const translations: Translations = {
     methodsTitle: 'Method Selection Guide',
     technicalTitle: 'Technical Specifications',
     termsTitle: 'Terms of Use & Disclaimer',
+    guideSendTitle: 'To send a message:',
+    guideSendWrite: 'Write: enter your confidential message in the box.',
+    guideSendPassword: 'Password: choose a strong password.',
+    guideSendAppearance: 'Appearance: choose the output encoding method.',
+    guideStandard: 'Standard: best for simple copy and storage.',
+    guideInvisible: 'Invisible text: hides the message inside cover text.',
+    guideSendAction: 'Send: press Encrypt Message.',
+    guideReceiveTitle: 'To read a message:',
+    guideReceiveTab: 'Open the Receive tab.',
+    guideReceivePaste: 'Paste the encrypted text into the message box.',
+    guideReceivePassword: 'Enter the password and decrypt.',
+    securitySeparate: 'Send the password separately: never include it in the same message.',
+    securityKeyboard: 'Be careful with keyboards: use trusted devices and input methods.',
+    securityClipboard: 'Clear the clipboard: copy another text after sending.',
+    securityForgot: 'Forgotten password means lost data: there is no recovery path.',
+    termsOpenSource: 'This app is open source and all cryptography runs inside the browser.',
+    termsNoServer: 'There is no server and data is not sent away for encryption.',
+    termsIrreversible: 'Forgotten passwords cannot be recovered.',
+    termsResponsibility: 'Correct usage is the user responsibility.',
+    techAlgorithm: 'Algorithm',
+    techKdf: 'Key derivation',
+    techIterations: '600,000 iterations',
+    techRandom: 'random',
+    techSteganography: 'Steganography',
+    footerBuiltBy: 'Built by',
 
     // Encoding Methods
     methodBase64: 'Standard (Base64)',
@@ -275,6 +338,8 @@ const translations: Translations = {
     fileVaultTitle: 'File-to-Text Vault',
     fileVaultSubtitle: 'Turn a small file into copyable encrypted text, then restore the original file with the same password.',
     fileVaultPickLabel: 'Small file (5MB max):',
+    fileVaultChooseFile: 'Choose File',
+    fileVaultChangeFile: 'Choose Another File',
     fileVaultPasswordLabel: 'File password:',
     fileVaultTextLabel: 'Encrypted file text:',
     fileVaultOutputLabel: 'Copyable output:',
@@ -311,6 +376,7 @@ const translations: Translations = {
     // Accessibility
     ariaThemeToggle: 'Toggle theme',
     ariaLangToggle: 'Toggle language',
+    ariaPasswordToggle: 'Show or hide password',
     ariaProcessing: 'Processing',
     ariaResult: 'Operation result',
   },
@@ -337,12 +403,7 @@ export class I18nModule {
       return;
     }
 
-    const browserLang = navigator.language.toLowerCase();
-    if (browserLang.startsWith('fa') || browserLang.startsWith('ar')) {
-      this.currentLang = 'fa';
-    } else {
-      this.currentLang = 'en';
-    }
+    this.currentLang = 'fa';
   }
 
   /**

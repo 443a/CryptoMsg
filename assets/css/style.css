@@ -163,6 +163,12 @@ body {
     gap: 8px;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .app-title {
     font-weight: 800;
     font-size: 1.2rem;
@@ -180,6 +186,12 @@ body {
     font-size: 0.6em;
     opacity: 0.7;
     font-weight: 400;
+}
+
+.app-title small {
+    color: var(--text-muted);
+    font-size: 0.6em;
+    font-weight: 500;
 }
 
 /* Icon Buttons */
@@ -343,6 +355,13 @@ label {
     font-weight: 500;
 }
 
+button span,
+label span,
+summary span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
 label i {
     color: var(--text-muted);
     font-size: 0.85rem;
@@ -379,15 +398,15 @@ textarea {
 select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: left 12px center;
-    padding-left: 36px;
+    background-position: right 12px center;
+    padding-right: 36px;
 }
 
 /* RTL Support */
 [dir="rtl"] select {
-    background-position: right 12px center;
-    padding-left: 16px;
-    padding-right: 36px;
+    background-position: left 12px center;
+    padding-left: 36px;
+    padding-right: 16px;
 }
 
 /* Password Field */
@@ -395,6 +414,8 @@ select {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
     margin-bottom: 8px;
 }
 
@@ -416,8 +437,7 @@ select {
     padding-right: 44px;
 }
 
-.password-toggle,
-.gen-pass-btn {
+.password-toggle {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -445,8 +465,11 @@ select {
 }
 
 .gen-pass-btn {
-    left: auto;
-    right: 10px;
+    position: static;
+    transform: none;
+    background: var(--glass-light);
+    border: 1px solid var(--border);
+    cursor: pointer;
     font-size: 0.75rem;
     color: var(--secondary);
     font-weight: 700;
@@ -459,7 +482,7 @@ select {
 }
 
 [dir="rtl"] .gen-pass-btn {
-    left: 10px;
+    left: auto;
     right: auto;
 }
 
@@ -691,6 +714,8 @@ input[type="checkbox"] {
     font-weight: 700;
     min-height: 42px;
     padding: 10px 14px;
+    text-align: center;
+    white-space: normal;
     transition: all 0.2s ease;
 }
 
@@ -847,9 +872,50 @@ input[type="checkbox"] {
 
 .file-vault-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
     margin-bottom: 16px;
+}
+
+.file-input-row {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+
+input.file-input-native {
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 1px;
+}
+
+.file-input-button {
+    align-items: center;
+    background: var(--glass-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    cursor: pointer;
+    display: inline-flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 0;
+    min-height: 42px;
+    padding: 10px 14px;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.file-input-button:hover,
+.file-input-native:focus-visible + .file-input-button {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
 }
 
 .file-vault textarea[readonly] {
@@ -897,7 +963,8 @@ input[type="checkbox"] {
     margin-bottom: 20px;
 }
 
-.info-section {
+.info-section,
+.info-container details {
     background: var(--glass);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border);
@@ -905,7 +972,8 @@ input[type="checkbox"] {
     overflow: hidden;
 }
 
-.info-section summary {
+.info-section summary,
+.info-container details summary {
     padding: 16px 20px;
     cursor: pointer;
     font-weight: 600;
@@ -918,18 +986,26 @@ input[type="checkbox"] {
     transition: background 0.2s ease;
 }
 
-.info-section summary:hover {
+.info-section summary:hover,
+.info-container details summary:hover {
     background: var(--glass-light);
 }
 
-.info-section summary::after {
+.info-section summary::-webkit-details-marker,
+.info-container details summary::-webkit-details-marker {
+    display: none;
+}
+
+.info-section summary::after,
+.info-container details summary::after {
     content: '+';
     font-size: 1.3rem;
     color: var(--text-muted);
     transition: transform 0.2s ease;
 }
 
-.info-section[open] summary::after {
+.info-section[open] summary::after,
+.info-container details[open] summary::after {
     content: '-';
     transform: rotate(0deg);
 }
@@ -953,18 +1029,41 @@ input[type="checkbox"] {
 
 .info-content ul,
 .info-content ol {
-    padding-right: 24px;
+    padding-left: 24px;
     margin: 12px 0;
 }
 
 [dir="rtl"] .info-content ul,
 [dir="rtl"] .info-content ol {
-    padding-right: 0;
-    padding-left: 24px;
+    padding-right: 24px;
+    padding-left: 0;
 }
 
 .info-content li {
     margin-bottom: 8px;
+}
+
+.specs-table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.specs-table td {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 12px;
+    vertical-align: top;
+}
+
+.specs-table tr:last-child td {
+    border-bottom: none;
+}
+
+.specs-table td:first-child {
+    color: var(--text-muted);
+    font-weight: 700;
+    width: 38%;
 }
 
 /* ==========================================
@@ -1159,6 +1258,33 @@ kbd {
     font-size: 0.85rem;
 }
 
+.footer {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0 20px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.footer p {
+    margin: 0;
+}
+
+.footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
 .footer-links {
     display: flex;
     justify-content: center;
@@ -1264,7 +1390,8 @@ kbd {
         gap: 10px;
     }
 
-    .header-right {
+    .header-right,
+    .header-actions {
         gap: 6px;
     }
 
@@ -1296,6 +1423,31 @@ kbd {
 
     .file-vault-actions {
         grid-template-columns: 1fr;
+    }
+
+    .file-vault-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .file-vault-badge {
+        align-self: flex-start;
+    }
+
+    .pass-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .gen-pass-btn {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .stats-box {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
     }
 
     input,

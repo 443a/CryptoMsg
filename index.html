@@ -191,8 +191,8 @@
         <!-- Result Area -->
         <section id="resultArea" class="result-container" style="display:none;" aria-live="polite">
             <div class="stats-box">
-                <div><i class="fas fa-text-width"></i> <span id="charCount">0</span> کاراکتر</div>
-                <div><i class="fas fa-envelope"></i> <span id="smsCount">0</span> پیامک (تقریبی)</div>
+                <div><i class="fas fa-text-width"></i> <span id="charCount">0</span> <span id="charCountLabel">کاراکتر</span></div>
+                <div><i class="fas fa-envelope"></i> <span id="smsCount">0</span> <span id="smsCountLabel">پیامک (تقریبی)</span></div>
             </div>
             <div id="outputParts"></div>
         </section>
@@ -201,64 +201,70 @@
         <section id="fileVaultPanel" class="file-vault" aria-labelledby="fileVaultTitle">
             <div class="file-vault-header">
                 <div>
-                    <h2 id="fileVaultTitle"><i class="fas fa-file-shield"></i> <span>File-to-Text Vault</span></h2>
-                    <p>Turn a small file into encrypted text, then restore it offline with the same password.</p>
+                    <h2 id="fileVaultTitle"><i class="fas fa-file-shield"></i> <span>صندوق فایل به متن</span></h2>
+                    <p>فایل‌های کوچک را به متن رمز شده قابل کپی تبدیل کنید و بعدا با همان رمز فایل اصلی را بازسازی کنید.</p>
                 </div>
                 <span class="file-vault-badge">CMF1</span>
             </div>
 
             <div class="form-group">
-                <label for="fileVaultFile">
+                <label for="fileVaultFile" id="fileVaultPickLabel">
                     <i class="fas fa-file-arrow-up"></i>
-                    <span>Small file (5MB max):</span>
+                    <span>فایل کوچک (حداکثر ۵ مگابایت):</span>
                 </label>
-                <input type="file" id="fileVaultFile">
-                <div id="fileVaultFileMeta" class="hint-text">No file selected yet.</div>
+                <div class="file-input-row">
+                    <input type="file" id="fileVaultFile" class="file-input-native">
+                    <label for="fileVaultFile" id="fileVaultChooseBtn" class="file-input-button">
+                        <i class="fas fa-file-arrow-up"></i>
+                        <span>انتخاب فایل</span>
+                    </label>
+                </div>
+                <div id="fileVaultFileMeta" class="hint-text">هنوز فایلی انتخاب نشده است.</div>
             </div>
 
             <section class="form-group">
                 <label for="fileVaultPassword">
                     <i class="fas fa-key"></i>
-                    <span>File password:</span>
+                    <span>رمز فایل:</span>
                 </label>
                 <input
                     type="password"
                     id="fileVaultPassword"
                     autocomplete="new-password"
-                    placeholder="Use a strong unique password"
+                    placeholder="یک رمز قوی و منحصربه‌فرد وارد کنید"
                 >
             </section>
 
             <div class="file-vault-actions">
                 <button id="fileVaultEncryptBtn" class="btn-secondary" type="button">
                     <i class="fas fa-lock"></i>
-                    <span>Convert File to Text</span>
+                    <span>تبدیل فایل به متن</span>
                 </button>
                 <button id="fileVaultDecryptBtn" class="btn-secondary" type="button">
                     <i class="fas fa-download"></i>
-                    <span>Restore and Download File</span>
+                    <span>بازسازی و دانلود فایل</span>
                 </button>
             </div>
 
             <section class="form-group">
                 <label for="fileVaultText">
                     <i class="fas fa-paste"></i>
-                    <span>Encrypted file text:</span>
+                    <span>متن رمز شده فایل:</span>
                 </label>
-                <textarea id="fileVaultText" rows="4" placeholder="Paste CMF1. text here..."></textarea>
+                <textarea id="fileVaultText" rows="4" placeholder="متن CMF1. را اینجا وارد کنید..."></textarea>
             </section>
 
             <section class="form-group">
                 <label for="fileVaultOutput">
                     <i class="fas fa-align-left"></i>
-                    <span>Copyable output:</span>
+                    <span>خروجی قابل کپی:</span>
                 </label>
                 <textarea id="fileVaultOutput" rows="4" readonly></textarea>
             </section>
 
             <button id="fileVaultCopyBtn" class="btn-secondary btn-copy-vault" type="button">
                 <i class="fas fa-copy"></i>
-                <span>Copy File Text</span>
+                <span>کپی متن فایل</span>
             </button>
 
             <div id="fileVaultStatus" class="file-vault-status info" style="display:none;" role="status"></div>

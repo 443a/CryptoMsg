@@ -64,12 +64,8 @@ class StateManagerClass {
     if (stored === 'fa' || stored === 'en') {
       return stored;
     }
-    // Check browser language
-    const browserLang = navigator.language.toLowerCase();
-    if (browserLang.startsWith('fa') || browserLang.startsWith('ar')) {
-      return 'fa';
-    }
-    return 'en';
+
+    return 'fa';
   }
 
   private loadAutoClear(): boolean {
