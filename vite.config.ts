@@ -9,6 +9,24 @@ import { resolve } from 'path';
 export default defineConfig({
   base: './',
 
+  plugins: [
+    {
+      name: 'cryptomsg-dev-pages-entry',
+      configureServer(server) {
+        server.middlewares.use((request, response, next) => {
+          if (request.url?.startsWith('/assets/app/pages-main.js')) {
+            response.statusCode = 302;
+            response.setHeader('Location', '/src/main.ts');
+            response.end();
+            return;
+          }
+
+          next();
+        });
+      },
+    },
+  ],
+
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
