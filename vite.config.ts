@@ -23,20 +23,10 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     sourcemap: true,
-    minify: 'terser',
     target: 'es2020',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-      },
-      output: {
-        manualChunks: {
-          'crypto': resolve(__dirname, 'src/core/crypto.ts'),
-          'encoding': resolve(__dirname, 'src/core/encoding.ts'),
-          'ui': resolve(__dirname, 'src/ui/index.ts'),
-          'i18n': resolve(__dirname, 'src/i18n/index.ts'),
-          'services': resolve(__dirname, 'src/services/index.ts'),
-        },
       },
     },
   },
