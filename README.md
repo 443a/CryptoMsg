@@ -16,6 +16,40 @@
 
 ---
 
+## Architecture Notes
+
+- `src/core/crypto.ts` keeps the existing text encryption API.
+- `src/core/fileVault.ts` owns the `CMF1.` file-to-text payload format, file metadata packing, AES-GCM encryption, PBKDF2 key derivation, and browser download reconstruction.
+- `src/workers/crypto.worker.ts` mirrors the crypto operations in a Web Worker so PBKDF2 and AES-GCM do not block the UI.
+- `src/services/cryptoWorker.ts` provides request/response correlation and a main-thread fallback when workers are unavailable.
+- `src/ui/index.ts` renders user-controlled result text with DOM APIs and `textContent`, not HTML interpolation.
+
+---
+
+## File-to-Text Vault
+
+CryptoMsg can turn a small local file into a copyable encrypted text payload and restore it later with the same password.
+
+| Property | Details |
+| --- | --- |
+| Format | `CMF1.` text envelope with versioned binary payload encoded as Base64URL |
+| Limit | 5MB per file |
+| Metadata | Original filename, MIME type, size, and last modified time are stored inside the encrypted envelope metadata block |
+| Crypto | AES-GCM 256-bit with a fresh 128-bit salt and 96-bit IV per encryption |
+| KDF | PBKDF2-SHA-256 with 600,000 iterations |
+| Execution | File encryption and decryption run in a Web Worker when available |
+
+Use it from the **File-to-Text Vault** panel:
+
+1. Choose a small file.
+2. Enter a strong password.
+3. Click **Convert File to Text** and copy the `CMF1.` output.
+4. To restore, paste the `CMF1.` text, enter the same password, and click **Restore and Download File**.
+
+All file bytes stay in the browser. The app does not upload file contents, passwords, salts, IVs, or ciphertext.
+
+---
+
 ## ✨ ویژگی‌های کلیدی
 
 ### 🔒 امنیت سطح بالا

@@ -109,3 +109,31 @@
 ---
 
 *آخرین بروزرسانی: ۱۴۰۵/۰۴/۰۵*
+
+---
+
+## File-to-Text Vault Security Model
+
+The File-to-Text Vault is fully client-side. File bytes are read in the browser, encrypted locally, and encoded as a `CMF1.` text envelope. CryptoMsg does not send file contents, passwords, salts, IVs, metadata, plaintext, or ciphertext to an application server.
+
+Cryptographic parameters:
+
+| Component | Primitive |
+| --- | --- |
+| Encryption | AES-GCM with 256-bit keys |
+| Authentication | AES-GCM authentication tag over ciphertext |
+| KDF | PBKDF2-HMAC-SHA-256 |
+| KDF iterations | 600,000 |
+| Salt | 128-bit random value from `crypto.getRandomValues()` per encryption |
+| IV / nonce | 96-bit random value from `crypto.getRandomValues()` per encryption |
+| Payload encoding | Versioned `CMF1.` envelope encoded with Base64URL |
+
+Security notes:
+
+- Password-derived AES keys are non-extractable.
+- Salts and IVs are generated fresh for every encryption.
+- Decryption fails if the password is wrong or the payload is modified.
+- File operations are limited to 5MB to keep offline browser processing predictable.
+- Expensive crypto runs in a Web Worker when available.
+- UI output uses DOM APIs and `textContent` for user-controlled text to reduce DOM XSS risk.
+- The app shell no longer depends on external font/icon CDNs for core operation.
