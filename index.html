@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+        Content Security Policy
+        Note: frame-ancestors is ignored in meta tag (requires HTTP header)
+        For production, set CSP via HTTP headers for better security
+    -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self';
-        style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+        script-src 'self' 'unsafe-eval';
+        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
         font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
         img-src 'self' data: blob:;
         connect-src 'self';
-        frame-ancestors 'none';
         base-uri 'self';
         form-action 'self';
     ">
@@ -18,17 +22,16 @@
     <meta name="author" content="443a">
     <meta name="theme-color" content="#0f172a">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="CryptoMsg - رمزنگاری امن">
-    <meta property="og:description" content="ابزار فوق امن رمزنگاری متن و پنهان‌نگاری">
-    <meta property="og:type" content="website">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <title>کریپتو مسنجر | CryptoMsg Ultimate</title>
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
