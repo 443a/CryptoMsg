@@ -120,6 +120,28 @@ const translations: Translations = {
     fileEncrypt: 'رمزنگاری فایل',
     fileDecrypt: 'رمزگشایی فایل',
     fileDownload: 'دانلود فایل رمز شده',
+    fileVaultTitle: 'صندوق فایل به متن',
+    fileVaultSubtitle: 'فایل‌های کوچک را به متن رمز شده قابل کپی تبدیل کنید و بعدا با همان رمز فایل اصلی را بازسازی کنید.',
+    fileVaultPickLabel: 'فایل کوچک (حداکثر ۵ مگابایت):',
+    fileVaultPasswordLabel: 'رمز فایل:',
+    fileVaultTextLabel: 'متن رمز شده فایل:',
+    fileVaultOutputLabel: 'خروجی قابل کپی:',
+    fileVaultEncrypt: 'تبدیل فایل به متن',
+    fileVaultDecrypt: 'بازسازی و دانلود فایل',
+    fileVaultCopy: 'کپی متن فایل',
+    fileVaultTextPlaceholder: 'متن CMF1. را اینجا وارد کنید...',
+    fileVaultNoFile: 'هنوز فایلی انتخاب نشده است.',
+    fileVaultProcessing: 'در حال پردازش فایل...',
+    errorFileVaultFields: 'لطفا فایل و رمز را وارد کنید.',
+    errorFileVaultDecryptFields: 'لطفا متن رمز شده فایل و رمز را وارد کنید.',
+    errorFileVaultTooBig: 'فایل بزرگ است. حداکثر اندازه مجاز ۵ مگابایت است.',
+    errorFileVaultInvalid: 'متن وارد شده قالب معتبر CMF1 ندارد.',
+    errorFileVaultEncrypt: 'رمزنگاری فایل ناموفق بود.',
+    errorFileVaultDecrypt: 'رمزگشایی فایل ناموفق بود؛ رمز اشتباه است یا متن تغییر کرده است.',
+    errorFileVaultNoOutput: 'خروجی برای کپی وجود ندارد.',
+    errorFileVaultCopy: 'کپی کردن خروجی ناموفق بود.',
+    successFileVaultEncrypted: 'فایل به متن رمز شده تبدیل شد.',
+    successFileVaultDecrypted: 'فایل بازسازی و دانلود شد:',
 
     // History
     historyTitle: 'تاریخچه',
@@ -250,6 +272,28 @@ const translations: Translations = {
     fileEncrypt: 'Encrypt File',
     fileDecrypt: 'Decrypt File',
     fileDownload: 'Download Encrypted File',
+    fileVaultTitle: 'File-to-Text Vault',
+    fileVaultSubtitle: 'Turn a small file into copyable encrypted text, then restore the original file with the same password.',
+    fileVaultPickLabel: 'Small file (5MB max):',
+    fileVaultPasswordLabel: 'File password:',
+    fileVaultTextLabel: 'Encrypted file text:',
+    fileVaultOutputLabel: 'Copyable output:',
+    fileVaultEncrypt: 'Convert File to Text',
+    fileVaultDecrypt: 'Restore and Download File',
+    fileVaultCopy: 'Copy File Text',
+    fileVaultTextPlaceholder: 'Paste CMF1. text here...',
+    fileVaultNoFile: 'No file selected yet.',
+    fileVaultProcessing: 'Processing file...',
+    errorFileVaultFields: 'Please choose a file and enter a password.',
+    errorFileVaultDecryptFields: 'Please paste encrypted file text and enter the password.',
+    errorFileVaultTooBig: 'File is too large. Maximum size is 5MB.',
+    errorFileVaultInvalid: 'The text is not a valid CMF1 file vault payload.',
+    errorFileVaultEncrypt: 'File encryption failed.',
+    errorFileVaultDecrypt: 'File decryption failed; the password is wrong or text was changed.',
+    errorFileVaultNoOutput: 'There is no output to copy.',
+    errorFileVaultCopy: 'Could not copy the output.',
+    successFileVaultEncrypted: 'File was converted to encrypted text.',
+    successFileVaultDecrypted: 'File restored and downloaded:',
 
     // History
     historyTitle: 'History',
@@ -348,9 +392,11 @@ export class I18nModule {
     const textKey = keyMap[mode] ?? 'descBase64';
     const warnKey = `warn${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
 
+    const warn = translations[this.currentLang]?.[warnKey] ?? translations.fa[warnKey] ?? '';
+
     return {
       text: this.t(textKey),
-      warn: this.t(warnKey),
+      warn,
     };
   }
 }

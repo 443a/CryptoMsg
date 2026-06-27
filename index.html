@@ -11,8 +11,8 @@
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         script-src 'self' 'unsafe-eval';
-        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
-        font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+        style-src 'self' 'unsafe-inline';
+        font-src 'self';
         img-src 'self' data: blob:;
         connect-src 'self';
         base-uri 'self';
@@ -32,11 +32,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
 
     <!-- Styles -->
     <link rel="stylesheet" href="assets/css/style.css">
@@ -200,6 +195,73 @@
                 <div><i class="fas fa-envelope"></i> <span id="smsCount">0</span> پیامک (تقریبی)</div>
             </div>
             <div id="outputParts"></div>
+        </section>
+
+        <!-- File-to-Text Vault -->
+        <section id="fileVaultPanel" class="file-vault" aria-labelledby="fileVaultTitle">
+            <div class="file-vault-header">
+                <div>
+                    <h2 id="fileVaultTitle"><i class="fas fa-file-shield"></i> <span>File-to-Text Vault</span></h2>
+                    <p>Turn a small file into encrypted text, then restore it offline with the same password.</p>
+                </div>
+                <span class="file-vault-badge">CMF1</span>
+            </div>
+
+            <div class="form-group">
+                <label for="fileVaultFile">
+                    <i class="fas fa-file-arrow-up"></i>
+                    <span>Small file (5MB max):</span>
+                </label>
+                <input type="file" id="fileVaultFile">
+                <div id="fileVaultFileMeta" class="hint-text">No file selected yet.</div>
+            </div>
+
+            <section class="form-group">
+                <label for="fileVaultPassword">
+                    <i class="fas fa-key"></i>
+                    <span>File password:</span>
+                </label>
+                <input
+                    type="password"
+                    id="fileVaultPassword"
+                    autocomplete="new-password"
+                    placeholder="Use a strong unique password"
+                >
+            </section>
+
+            <div class="file-vault-actions">
+                <button id="fileVaultEncryptBtn" class="btn-secondary" type="button">
+                    <i class="fas fa-lock"></i>
+                    <span>Convert File to Text</span>
+                </button>
+                <button id="fileVaultDecryptBtn" class="btn-secondary" type="button">
+                    <i class="fas fa-download"></i>
+                    <span>Restore and Download File</span>
+                </button>
+            </div>
+
+            <section class="form-group">
+                <label for="fileVaultText">
+                    <i class="fas fa-paste"></i>
+                    <span>Encrypted file text:</span>
+                </label>
+                <textarea id="fileVaultText" rows="4" placeholder="Paste CMF1. text here..."></textarea>
+            </section>
+
+            <section class="form-group">
+                <label for="fileVaultOutput">
+                    <i class="fas fa-align-left"></i>
+                    <span>Copyable output:</span>
+                </label>
+                <textarea id="fileVaultOutput" rows="4" readonly></textarea>
+            </section>
+
+            <button id="fileVaultCopyBtn" class="btn-secondary btn-copy-vault" type="button">
+                <i class="fas fa-copy"></i>
+                <span>Copy File Text</span>
+            </button>
+
+            <div id="fileVaultStatus" class="file-vault-status info" style="display:none;" role="status"></div>
         </section>
 
         <!-- QR Code Section -->

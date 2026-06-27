@@ -66,9 +66,54 @@
 
 * {
     box-sizing: border-box;
-    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif;
     margin: 0;
     padding: 0;
+}
+
+.fas {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 1em;
+}
+
+.fa-lock::before { content: "\1F512"; }
+.fa-unlock::before { content: "\1F513"; }
+.fa-download::before { content: "\2193"; }
+.fa-shield-halved::before,
+.fa-shield-alt::before { content: "\25C8"; }
+.fa-moon::before { content: "\25D0"; }
+.fa-sun::before { content: "\25CB"; }
+.fa-language::before { content: "Aa"; font-size: 0.75em; }
+.fa-layer-group::before { content: "\2261"; }
+.fa-info-circle::before { content: "i"; }
+.fa-exclamation-triangle::before { content: "!"; }
+.fa-mask::before { content: "\25A7"; }
+.fa-pen::before { content: "\270E"; }
+.fa-robot::before { content: "\25A3"; }
+.fa-key::before { content: "\26BF"; }
+.fa-magic::before { content: "\2726"; }
+.fa-eye::before { content: "\25C9"; }
+.fa-eye-slash::before { content: "\25CC"; }
+.fa-text-width::before { content: "T"; }
+.fa-envelope::before { content: "\2709"; }
+.fa-qrcode::before { content: "\25A6"; }
+.fa-copy::before { content: "\2398"; }
+.fa-book-open::before { content: "\25AB"; }
+.fa-code::before { content: "</>"; font-size: 0.7em; }
+.fa-scale-balanced::before { content: "\2696"; }
+.fa-sync-alt::before { content: "\21BB"; }
+.fa-file-shield::before { content: "\25A3"; }
+.fa-file-arrow-up::before { content: "\21E7"; }
+.fa-paste::before { content: "\2398"; }
+.fa-align-left::before { content: "\2263"; }
+.fa-spinner::before { content: "\25CC"; }
+.fa-spin {
+    animation: spin 1s linear infinite;
 }
 
 html {
@@ -632,6 +677,34 @@ input[type="checkbox"] {
     transform: translateY(-2px);
 }
 
+.btn-secondary {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--glass-light);
+    color: var(--text);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    min-height: 42px;
+    padding: 10px 14px;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: white;
+    background: var(--primary);
+}
+
+.btn-secondary:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
 /* ==========================================
    12. RESULT AREA
    ========================================== */
@@ -722,7 +795,97 @@ input[type="checkbox"] {
 }
 
 /* ==========================================
-   13. INFO CONTAINER
+   13. FILE-TO-TEXT VAULT
+   ========================================== */
+
+.file-vault {
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+    padding-top: 22px;
+}
+
+.file-vault-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.file-vault-header h2 {
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.file-vault-header h2 i {
+    color: var(--primary);
+}
+
+.file-vault-header p {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.file-vault-badge {
+    background: var(--success-bg);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    border-radius: 8px;
+    color: var(--success);
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    padding: 6px 9px;
+}
+
+.file-vault-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.file-vault textarea[readonly] {
+    min-height: 120px;
+}
+
+.btn-copy-vault {
+    width: 100%;
+}
+
+.file-vault-status {
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-top: 12px;
+    padding: 10px 12px;
+}
+
+.file-vault-status.info {
+    background: var(--info-bg);
+    color: var(--info);
+}
+
+.file-vault-status.success {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.file-vault-status.error {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+/* ==========================================
+   14. INFO CONTAINER
    ========================================== */
 
 .info-container {
@@ -1080,6 +1243,12 @@ kbd {
     }
 }
 
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* ==========================================
    20. RESPONSIVE
    ========================================== */
@@ -1122,6 +1291,10 @@ kbd {
     }
 
     .method-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .file-vault-actions {
         grid-template-columns: 1fr;
     }
 

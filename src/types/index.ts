@@ -44,6 +44,57 @@ export interface EncryptedData {
 }
 
 /**
+ * File-to-text vault metadata stored inside the encrypted text envelope.
+ */
+export interface FileVaultMetadata {
+  filename: string;
+  mimeType: string;
+  size: number;
+  lastModified?: number;
+}
+
+/**
+ * Parsed encrypted file-to-text vault payload.
+ */
+export interface FileVaultEncryptedPayload {
+  salt: Uint8Array;
+  iv: Uint8Array;
+  metadata: FileVaultMetadata;
+  ciphertext: Uint8Array;
+}
+
+/**
+ * Decrypted file-to-text vault result for browser download.
+ */
+export interface FileVaultDecryptionResult {
+  blob: Blob;
+  filename: string;
+  mimeType: string;
+  size: number;
+}
+
+/**
+ * Crypto worker operation names.
+ */
+export type CryptoWorkerOperation =
+  | 'encrypt'
+  | 'decrypt'
+  | 'generatePassword'
+  | 'calculateStrength'
+  | 'encryptFileToText'
+  | 'decryptTextToFile';
+
+/**
+ * File-to-text worker result with transferable bytes.
+ */
+export interface FileVaultWorkerFileResult {
+  bytes: ArrayBuffer;
+  filename: string;
+  mimeType: string;
+  size: number;
+}
+
+/**
  * Packed encrypted data (Base64 encoded JSON)
  */
 export interface PackedEncryptedData {
