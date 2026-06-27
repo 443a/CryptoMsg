@@ -366,7 +366,7 @@ export class UIModule {
     const splitOutput = this.getElement('splitOutput') as HTMLInputElement;
 
     const len = Array.from(text).length;
-    let limit = mode === 'base64' || mode === 'englishFake' ? 160 : 70;
+    const limit = mode === 'base64' || mode === 'englishFake' ? 160 : 70;
     const sms = Math.ceil(len / limit);
 
     if (charCount) charCount.textContent = String(len);

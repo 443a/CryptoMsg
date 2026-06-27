@@ -76,12 +76,18 @@ export class EncodingModule {
 
   /**
    * Check if text looks like v4 JSON format
+   * v4 used OpenSSL-style "Salted__" prefix or raw Base64
    */
   looksLikeV4JSON(str: string): boolean {
     const clean = str.trim();
-    if (!clean.startsWith('ey')) return false;
+    // v4 format started with eyJ (base64 of {)
+    if (!clean.startsWith('eyJ')) return false;
+    // Try to validate as proper base64
     try {
-      return window.atob(window.btoa(clean)) === clean;
+      const decoded = window.atob(clean);
+      // Check if it's valid JSON
+      JSON.parse(decoded);
+      return true;
     } catch {
       return false;
     }

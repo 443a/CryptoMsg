@@ -76,11 +76,10 @@ async function deriveKey(keyMaterial: CryptoKey, salt: Uint8Array): Promise<Cryp
 }
 
 function arrayBufferToBase64(buffer: ArrayBuffer | Uint8Array): string {
-  let binary = '';
   const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i] ?? 0);
-  }
+  const binary = Array.from(bytes)
+    .map(b => String.fromCharCode(b))
+    .join('');
   return btoa(binary);
 }
 
@@ -152,8 +151,12 @@ function generatePassword(length: number = 24): string {
 
   let password = '';
   for (let i = 0; i < length; i++) {
-    const charIndex = randomValues[i] % charsetArray.length;
-    password += charsetArray[charIndex] ?? '';
+    // noUncheckedIndexedAccess requires explicit check
+    const randomValue = randomValues[i];
+    if (randomValue === undefined) continue;
+    const charIndex = randomValue % charsetArray.length;
+    // charIndex is always valid since it's modulo charsetArray.length
+    password += charsetArray[charIndex]!;
   }
   return password;
 }

@@ -8,21 +8,15 @@
 
 const CACHE_NAME = 'cryptomsg-v5.0.0-ultimate';
 
-const ASSETS_TO_CACHE = [
+// Dynamic cache list - will be populated on install
+let ASSETS_TO_CACHE = [
     './',
     './index.html',
     './manifest.json',
     './assets/css/style.css',
-    './assets/js/app.js',
     './assets/icons/icon-192.png',
     './assets/icons/icon-512.png',
     './assets/icons/icon.svg'
-];
-
-// External resources with CORS
-const EXTERNAL_ASSETS = [
-    'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
 // Install event - cache assets
@@ -33,22 +27,6 @@ self.addEventListener('install', (event) => {
             caches.open(CACHE_NAME).then((cache) => {
                 return cache.addAll(ASSETS_TO_CACHE);
             }),
-            // Try to cache external assets (don't fail if they don't load)
-            caches.open(CACHE_NAME).then((cache) => {
-                return Promise.allSettled(
-                    EXTERNAL_ASSETS.map(url =>
-                        fetch(url, { mode: 'cors' })
-                            .then(response => {
-                                if (response.ok) {
-                                    return cache.put(url, response);
-                                }
-                            })
-                            .catch(() => {
-                                console.log('Could not cache:', url);
-                            })
-                    )
-                );
-            })
         ])
     );
     // Activate immediately
