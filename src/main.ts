@@ -10,11 +10,6 @@ import { UI } from './ui';
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI
   UI.init();
-
-  // Log initialization (only in development)
-  if (import.meta.env.DEV) {
-    console.debug('CryptoMsg v5.0.0 initialized');
-  }
 });
 
 // Export for debugging

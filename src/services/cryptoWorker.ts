@@ -136,7 +136,7 @@ class CryptoWorkerClient {
 
       try {
         worker.postMessage({ type, id, payload }, transfer);
-      } catch (error) {
+      } catch {
         this.pending.delete(id);
         fallback().then(resolve, reject).catch(reject);
       }

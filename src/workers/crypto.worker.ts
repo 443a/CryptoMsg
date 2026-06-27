@@ -136,9 +136,14 @@ function readUint32(bytes: Uint8Array, offset: number): number {
   return new DataView(bytes.buffer, bytes.byteOffset + offset, 4).getUint32(0, false);
 }
 
+function isUnsafeFilenameChar(char: string): boolean {
+  const codePoint = char.codePointAt(0) ?? 0;
+  return codePoint < 32 || codePoint === 127 || '<>:"/\\|?*'.includes(char);
+}
+
 function sanitizeFilename(filename: string, fallback = 'cryptomsg-file'): string {
-  const cleaned = filename
-    .replace(/[\u0000-\u001f\u007f<>:"/\\|?*]+/g, '_')
+  const cleaned = Array.from(filename, (char) => (isUnsafeFilenameChar(char) ? '_' : char))
+    .join('')
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^\.+$/, '');

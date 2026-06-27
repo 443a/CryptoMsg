@@ -234,13 +234,6 @@ export interface BeforeInstallPromptEvent extends Event {
 }
 
 /**
- * Service Worker registration
- */
-export interface ServiceWorkerRegistration {
-  // Standard ServiceWorkerRegistration properties
-}
-
-/**
  * File encryption result
  */
 export interface FileEncryptionResult {

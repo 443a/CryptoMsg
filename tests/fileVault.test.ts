@@ -32,6 +32,14 @@ async function blobToText(blob: Blob): Promise<string> {
   return new TextDecoder().decode(buffer);
 }
 
+function replaceBase64UrlChar(text: string, index: number): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  const current = text[index] ?? 'A';
+  const currentIndex = alphabet.indexOf(current);
+  const replacement = alphabet[(Math.max(currentIndex, 0) + 1) % alphabet.length];
+  return `${text.slice(0, index)}${replacement}${text.slice(index + 1)}`;
+}
+
 describe('FileVaultModule', () => {
   it('should encrypt a file into copyable CMF1 text and restore it', async () => {
     const file = new File(['hello file vault'], 'hello.txt', {
@@ -87,9 +95,8 @@ describe('FileVaultModule', () => {
   it('should reject tampered payload text', async () => {
     const file = new File(['secret'], 'secret.txt', { type: 'text/plain' });
     const vaultText = await FileVault.encryptFileToText(file, 'correct password');
-    const lastChar = vaultText.at(-1);
-    const replacement = lastChar === 'A' ? 'B' : 'A';
-    const tampered = `${vaultText.slice(0, -1)}${replacement}`;
+    const tamperIndex = vaultText.length - 10;
+    const tampered = replaceBase64UrlChar(vaultText, tamperIndex);
 
     await expect(FileVault.decryptTextToFile(tampered, 'correct password')).rejects.toBeInstanceOf(
       CryptoError
