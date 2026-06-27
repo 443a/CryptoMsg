@@ -11,7 +11,9 @@ export function toUint8Array(data: ArrayBuffer | Uint8Array): Uint8Array {
 }
 
 export function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
 }
 
 export function bytesToBase64(data: ArrayBuffer | Uint8Array): string {
