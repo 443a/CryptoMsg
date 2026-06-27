@@ -200,6 +200,7 @@ class StateManagerClass {
     this.setTheme('dark');
     this.setLanguage('fa');
     this.setAutoClear(false);
+    this.clearHistory();
   }
 }
 

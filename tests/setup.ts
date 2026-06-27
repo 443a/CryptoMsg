@@ -3,61 +3,22 @@
  * @version 5.0.0
  */
 
-// Mock Web Crypto API
-class MockCrypto {
-  getRandomValues<T extends ArrayBufferView | null>(array: T): T {
-    const bytes = new Uint8Array(array.byteLength);
-    for (let i = 0; i < bytes.length; i++) {
-      bytes[i] = Math.floor(Math.random() * 256);
-    }
-    return new Uint8Array(array.buffer, 0, array.byteLength) as T;
-  }
-}
-
-// @ts-expect-error - Mock window.crypto
-globalThis.crypto = {
-  subtle: {
-    importKey: async () => ({}),
-    deriveKey: async () => ({}),
-    encrypt: async (opts: object, key: object, data: BufferSource) => {
-      return data;
-    },
-    decrypt: async (opts: object, key: object, data: BufferSource) => {
-      return data;
-    },
-    getRandomValues: (array: ArrayBufferView | null) => {
-      const bytes = new Uint8Array(array!.byteLength);
-      for (let i = 0; i < bytes.length; i++) {
-        bytes[i] = Math.floor(Math.random() * 256);
-      }
-      return bytes;
-    },
+// Mock localStorage
+const localStorageMock = {
+  store: {} as Record<string, string>,
+  getItem(key: string): string | null {
+    return this.store[key] ?? null;
   },
-  getRandomValues: (array: ArrayBufferView | null) => {
-    const bytes = new Uint8Array(array!.byteLength);
-    for (let i = 0; i < bytes.length; i++) {
-      bytes[i] = Math.floor(Math.random() * 256);
-    }
-    return bytes;
+  setItem(key: string, value: string): void {
+    this.store[key] = value;
+  },
+  removeItem(key: string): void {
+    delete this.store[key];
+  },
+  clear(): void {
+    this.store = {};
   },
 };
-
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => {
-      store[key] = value;
-    },
-    removeItem: (key: string) => {
-      delete store[key];
-    },
-    clear: () => {
-      store = {};
-    },
-  };
-})();
 
 Object.defineProperty(globalThis, 'localStorage', {
   value: localStorageMock,
@@ -78,6 +39,50 @@ Object.defineProperty(navigator, 'serviceWorker', {
     register: async () => ({}),
     getRegistrations: async () => [],
   },
+  configurable: true,
+});
+
+// Mock Web Crypto API
+const mockCrypto = {
+  getRandomValues<T extends Uint8Array>(array: T): T {
+    const bytes = new Uint8Array(array.byteLength);
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = Math.floor(Math.random() * 256);
+    }
+    return new Uint8Array(array.buffer, 0, array.byteLength) as T;
+  },
+  subtle: {
+    importKey: async () => ({}),
+    deriveKey: async () => ({}),
+    encrypt: async (_opts: unknown, _key: unknown, data: BufferSource) => data,
+    decrypt: async (_opts: unknown, _key: unknown, data: BufferSource) => data,
+    getRandomValues<T extends Uint8Array>(array: T): T {
+      const bytes = new Uint8Array(array.byteLength);
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = Math.floor(Math.random() * 256);
+      }
+      return new Uint8Array(array.buffer, 0, array.byteLength) as T;
+    },
+  },
+};
+
+// Use Object.defineProperty to override crypto
+Object.defineProperty(globalThis, 'crypto', {
+  value: mockCrypto,
+  writable: true,
+  configurable: true,
+});
+
+// Mock crypto.getRandomValues for Uint32Array
+Object.defineProperty(globalThis.crypto, 'getRandomValues', {
+  value<T extends Uint32Array>(array: T): T {
+    const values = new Uint32Array(array.byteLength / 4);
+    for (let i = 0; i < values.length; i++) {
+      values[i] = Math.floor(Math.random() * 4294967296);
+    }
+    return new Uint32Array(array.buffer, 0, array.byteLength / 4) as T;
+  },
+  writable: true,
   configurable: true,
 });
 
