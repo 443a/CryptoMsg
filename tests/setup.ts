@@ -3,6 +3,10 @@
  * @version 5.0.0
  */
 
+import { webcrypto } from 'node:crypto';
+
+const testCrypto = webcrypto as unknown as Crypto;
+
 // Mock localStorage
 const localStorageMock = {
   store: {} as Record<string, string>,
@@ -44,13 +48,13 @@ Object.defineProperty(navigator, 'serviceWorker', {
 
 // Use Node's real Web Crypto implementation in unit tests.
 Object.defineProperty(globalThis, 'crypto', {
-  value: crypto,
+  value: testCrypto,
   writable: true,
   configurable: true,
 });
 
 Object.defineProperty(window, 'crypto', {
-  value: crypto,
+  value: testCrypto,
   writable: true,
   configurable: true,
 });
